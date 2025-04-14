@@ -1,0 +1,69 @@
+app society {
+  wasp: {
+    version: "^0.16.0"
+  },
+  title: "Society",
+  auth: {
+    userEntity: User,
+    methods: {
+      google: {
+        configFn: import { getConfig } from "@src/auth/backend/google",
+        userSignupFields: import { userSignupFields } from "@src/auth/backend/google"
+      }
+    },
+    onAuthFailedRedirectTo: "/login"
+  },
+  client: {
+    rootComponent: import App from "@src/App",
+  },
+}
+
+route LoginRoute { path: "/login", to: LoginPage }
+page LoginPage {
+  component: import { Login } from "@src/auth/frontend/login-page"
+}
+
+route RootRoute { path: "/", to: MainPage }
+page MainPage {
+  authRequired: true,
+  component: import { MainPage } from "@src/MainPage"
+}
+
+route OnboardingRoute { path: "/on-boarding", to: OnboardingPage }
+page OnboardingPage {
+  authRequired: true,
+  component: import { OnboardingPage } from "@src/auth/frontend/onboarding-page"
+}
+
+// query getTasks {
+//   // We specify the JS implementation of our query (which is an async JS function)
+//   fn: import { getTasks } from "@src/tasks/queries",
+//   // We tell Wasp that this query is doing something with the `Task` entity. With that, Wasp will
+//   // automatically refresh the results of this query when tasks change.
+//   entities: [Task]
+// }
+
+action updateUserDetail {
+  fn: import { updateUserInfo } from "@src/auth/backend/actions",
+  entities: [User]
+}
+
+action createSociety {
+  fn: import { createSocietyWithBasicDeatil } from "@src/society/backend/actions",
+  entities: [Society]
+}
+
+query getMySociety{
+  fn: import { getSociety } from "@src/society/backend/querys",
+  entities: [Society]
+}
+
+// action updateTask {
+//   fn: import { updateTask } from "@src/tasks/actions",
+//   entities: [Task]
+// }
+
+// action deleteTasks {
+//   fn: import { deleteTasks } from "@src/tasks/actions",
+//   entities: [Task],
+// }
