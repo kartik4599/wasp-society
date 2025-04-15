@@ -1,6 +1,7 @@
 import { Button } from "../../components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { UserData } from "./onboarding-page";
+import { Link, routes } from "wasp/client/router";
 
 interface SuccessStepProps {
   userData: UserData;
@@ -44,12 +45,14 @@ export default function SuccessStep({ userData }: SuccessStepProps) {
       </div>
 
       <div className="pt-4">
-        <Button
-          onClick={handleContinue}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
-        >
-          Go to Dashboard
-        </Button>
+        <Link to={routes.RootRoute.to}>
+          <Button
+            onClick={handleContinue}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+          >
+            Go to Dashboard
+          </Button>
+        </Link>
       </div>
     </div>
   );
