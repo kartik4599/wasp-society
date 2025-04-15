@@ -6,7 +6,7 @@ import { useQuery, getMySociety } from "wasp/client/operations";
 import { Role } from "@prisma/client";
 
 const userRoutes: Record<Role, string[]> = {
-  [Role.owner]: [routes.OwnerDashboardRoute.to],
+  [Role.owner]: [routes.OwnerDashboardRoute.to, routes.CreateBuildingRoute.to],
   [Role.tenant]: [routes.TenantDashboardRoute.to],
   [Role.staff]: [],
 };
@@ -31,6 +31,8 @@ const useOnboarding = () => {
       return navigate(routes.OnboardingRoute.to);
     if (role === Role.owner && !society)
       return navigate(routes.OnboardingRoute.to);
+    if (pathname === routes.OnboardingRoute.to)
+      return navigate(routes.RootRoute.to);
   }, [user, navigate, society]);
 
   // redirecting user to dashboard accourding to it's user role
@@ -55,6 +57,8 @@ const useOnboarding = () => {
 
     return navigate(routes.RootRoute.to);
   }, [pathname, user]);
+
+  return { showDashboard: !commonRoutes.includes(pathname), user, society };
 };
 
 export default useOnboarding;

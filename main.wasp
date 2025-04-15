@@ -56,6 +56,17 @@ page OwnerDashboard{
   component: import { OwnerDashboard } from "@src/owner/frontend/dashboard.tsx"
 }
 
+route CreateBuildingRoute { path: "/create-building", to: CreateBuilding }
+page CreateBuilding{
+  authRequired: true,
+  component: import { CreateBuilding } from "@src/owner/frontend/building/create-building"
+}
+
+action createBuilding {
+  fn: import { createBuilding } from "@src/owner/backend/building/actions",
+  entities: [Society, Building]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,

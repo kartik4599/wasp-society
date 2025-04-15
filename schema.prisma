@@ -21,13 +21,35 @@ model User {
   name        String?
   phoneNumber String?
   Society     Society?
+  Unit        Unit[]
 }
 
 model Society {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   address     String
   type        String
-  createdById Int    @unique
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById Int        @unique
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  Buildings   Building[]
+}
+
+model Building {
+  id        Int     @id @default(autoincrement())
+  name      String
+  floors    Int?
+  societyId Int
+  society   Society @relation(fields: [societyId], references: [id])
+  Unit      Unit[]
+}
+
+model Unit {
+  id              Int      @id @default(autoincrement())
+  name            String
+  type            String
+  floor           Int?
+  buildingId      Int
+  building        Building @relation(fields: [buildingId], references: [id])
+  allocatedUserId Int?
+  allocatedTo     User?    @relation(fields: [allocatedUserId], references: [id])
 }

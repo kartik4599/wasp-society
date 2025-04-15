@@ -5,7 +5,6 @@ import DashboardSidebar from "./dashboard-sidebar";
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  title: string;
   userRole: string;
   userName: string;
   propertyName: string;
@@ -13,7 +12,6 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({
   children,
-  title,
   userRole,
   userName,
   propertyName,
@@ -23,7 +21,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen w-screen">
         <DashboardSidebar userRole={userRole} propertyName={propertyName} />
         <div className="flex-1 max-w-6xl mx-auto">
-          <DashboardHeader title={title} userName={userName} />
+          <DashboardHeader userName={userName} />
           <main className="mx-auto">{children}</main>
         </div>
       </div>

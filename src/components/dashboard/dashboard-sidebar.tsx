@@ -54,10 +54,10 @@ export default function DashboardSidebar({
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-gray-800">
-              Society360
+              {propertyName}
             </span>
             <span className="text-xs text-gray-600 truncate max-w-[140px]">
-              {propertyName}
+              Society360
             </span>
           </div>
         </div>
