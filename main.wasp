@@ -67,6 +67,23 @@ action createBuilding {
   entities: [Society, Building]
 }
 
+route DetailBuildingRoute { path: "/building-detail", to: DeatilBuilding }
+page DeatilBuilding{
+  authRequired: true,
+  component: import { BuildingDetail } from "@src/owner/frontend/building/building-detail"
+}
+
+query getBuildingDetail{
+  fn: import { getBuildingDetail } from "@src/owner/backend/building/querys",
+  entities: [Society, Building]
+}
+
+query getBuildingList{
+  fn: import { getBuildingList } from "@src/owner/backend/building/querys",
+  entities: [Society, Building, Unit]
+}
+
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,

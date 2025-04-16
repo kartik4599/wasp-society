@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../../components/ui/card";
 import { routes } from "wasp/client/router";
@@ -7,6 +7,7 @@ import MultipleBuildingsCreation from "../../../components/buildings/multiple-bu
 import UnitsCreation from "../../../components/buildings/units-creation";
 import BuildingConfirmation from "../../../components/buildings/building-confirmation";
 import { createBuilding } from "wasp/client/operations";
+import { useQuery, getBuildingDetail } from "wasp/client/operations";
 
 export type BuildingType = "single" | "multiple";
 export type UnitType =
@@ -43,6 +44,8 @@ export function CreateBuilding() {
   const [buildingType, setBuildingType] = useState<BuildingType | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]);
 
+  const { data } = useQuery(getBuildingDetail) as any;
+
   const handleBuildingTypeSelect = (type: BuildingType) => {
     setBuildingType(type);
 
@@ -73,10 +76,8 @@ export function CreateBuilding() {
   };
 
   const handleConfirmation = async () => {
-    // In a real app, this would save the data to the backend
-    console.log("Buildings and units created:", buildings);
     await createBuilding(buildings);
-    // navigate(routes.OwnerDashboardRoute.to);
+    navigate(routes.DetailBuildingRoute.to);
   };
 
   const handleBack = () => {
@@ -87,6 +88,9 @@ export function CreateBuilding() {
     }
   };
 
+  useEffect(() => {
+    if (data?.length) navigate(routes.DetailBuildingRoute.to);
+  }, [data]);
   return (
     <div className="container mx-auto max-w-5xl ">
       <Card className="backdrop-blur-lg bg-white/30 border border-white/50 shadow-xl rounded-2xl p-6 md:p-8">
