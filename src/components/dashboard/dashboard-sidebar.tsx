@@ -19,18 +19,75 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "../ui/sidebar";
-import { Link } from "wasp/client/router";
+import { Link, routes } from "wasp/client/router";
+import { useQuery, getMySociety } from "wasp/client/operations";
+import { useAuth, logout } from "wasp/client/auth";
+import { Role } from "@prisma/client";
 
-interface DashboardSidebarProps {
-  userRole: string;
-  propertyName: string;
-}
+export default function DashboardSidebar() {
+  const { data: society } = useQuery(getMySociety);
+  const { data: user } = useAuth();
 
-export default function DashboardSidebar({
-  userRole,
-  propertyName,
-}: DashboardSidebarProps) {
-  const isOwner = userRole === "property_owner";
+  if (!user?.role) return null;
+
+  const sidebarItems = {
+    [Role.owner]: [
+      { route: routes.OwnerDashboardRoute.to, name: "Dashboard", icon: Home },
+      {
+        route: routes.DetailBuildingRoute.to,
+        name: "Buildings",
+        icon: Building2,
+      },
+      { route: routes.OwnerDashboardRoute.to, name: "Tenants", icon: Users },
+      {
+        route: routes.OwnerDashboardRoute.to,
+        name: "Visitors",
+        icon: Calendar,
+      },
+      {
+        route: routes.OwnerDashboardRoute.to,
+        name: "Payments",
+        icon: CreditCard,
+      },
+      { route: routes.OwnerDashboardRoute.to, name: "Parking", icon: Car },
+      {
+        route: routes.OwnerDashboardRoute.to,
+        name: "Notifications",
+        icon: Bell,
+      },
+      {
+        route: routes.OwnerDashboardRoute.to,
+        name: "Settings",
+        icon: Settings,
+      },
+    ],
+    [Role.tenant]: [
+      { route: routes.TenantDashboardRoute.to, name: "Dashboard", icon: Home },
+      {
+        route: routes.TenantDashboardRoute.to,
+        name: "Rent & Payments",
+        icon: CreditCard,
+      },
+      { route: routes.TenantDashboardRoute.to, name: "Guests", icon: Users },
+      { route: routes.TenantDashboardRoute.to, name: "Parking", icon: Car },
+      {
+        route: routes.TenantDashboardRoute.to,
+        name: "Maintenance",
+        icon: Building2,
+      },
+      {
+        route: routes.TenantDashboardRoute.to,
+        name: "Notifications",
+        icon: Bell,
+      },
+      {
+        route: routes.TenantDashboardRoute.to,
+        name: "Settings",
+        icon: Settings,
+      },
+    ],
+    [Role.staff]: [],
+  };
 
   return (
     <Sidebar variant="floating">
@@ -54,7 +111,7 @@ export default function DashboardSidebar({
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-gray-800">
-              {propertyName}
+              {society?.name}
             </span>
             <span className="text-xs text-gray-600 truncate max-w-[140px]">
               Society360
@@ -64,95 +121,18 @@ export default function DashboardSidebar({
       </SidebarHeader>
       <SidebarContent className="">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive>
-              <Link to="/owner">
-                <Home className="h-4 w-4" />
-                <span>Dashboard</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {isOwner ? (
-            <>
-              <SidebarMenuItem>
+          {sidebarItems[user.role].map(({ route, icon: Icon, name }) => {
+            return (
+              <SidebarMenuItem key={name}>
                 <SidebarMenuButton asChild>
-                  <Link to="/owner">
-                    <Building2 className="h-4 w-4" />
-                    <span>Buildings</span>
+                  <Link to={route}>
+                    <Icon className="h-4 w-4" />
+                    <span>{name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <Users className="h-4 w-4" />
-                    <span>Tenants</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <Calendar className="h-4 w-4" />
-                    <span>Visitors</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <CreditCard className="h-4 w-4" />
-                    <span>Payments</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <Car className="h-4 w-4" />
-                    <span>Parking</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </>
-          ) : (
-            <>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <CreditCard className="h-4 w-4" />
-                    <span>Rent & Payments</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <Users className="h-4 w-4" />
-                    <span>Guests</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <Car className="h-4 w-4" />
-                    <span>Parking</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <Building2 className="h-4 w-4" />
-                    <span>Maintenance</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </>
-          )}
-
+            );
+          })}
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link to="/">
@@ -174,7 +154,7 @@ export default function DashboardSidebar({
       <SidebarFooter className="border-t border-white/20">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
+            <SidebarMenuButton onClick={logout}>
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
             </SidebarMenuButton>

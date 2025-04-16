@@ -10,11 +10,7 @@ const App = () => {
   const page = useMemo(() => {
     if (!showDashboard) return <Outlet />;
     return (
-      <DashboardLayout
-        userRole={user?.role || ""}
-        userName={user?.name || ""}
-        propertyName={society?.name || ""}
-      >
+      <DashboardLayout>
         <Outlet />
       </DashboardLayout>
     );

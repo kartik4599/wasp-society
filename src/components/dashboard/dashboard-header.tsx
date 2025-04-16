@@ -9,12 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { SidebarTrigger } from "../ui/sidebar";
+import { useAuth } from "wasp/client/auth";
 
-interface DashboardHeaderProps {
-  userName: string;
-}
+export default function DashboardHeader() {
+  const { data: user } = useAuth();
 
-export default function DashboardHeader({ userName }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-white/20 bg-white/10 backdrop-blur-md px-4">
       <div className="flex items-center gap-3">
@@ -45,7 +44,7 @@ export default function DashboardHeader({ userName }: DashboardHeaderProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              <span>{userName}</span>
+              <span>{user?.name}</span>
             </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>

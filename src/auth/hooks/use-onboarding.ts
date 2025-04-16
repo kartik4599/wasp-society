@@ -6,7 +6,11 @@ import { useQuery, getMySociety } from "wasp/client/operations";
 import { Role } from "@prisma/client";
 
 const userRoutes: Record<Role, string[]> = {
-  [Role.owner]: [routes.OwnerDashboardRoute.to, routes.CreateBuildingRoute.to],
+  [Role.owner]: [
+    routes.OwnerDashboardRoute.to,
+    routes.CreateBuildingRoute.to,
+    routes.DetailBuildingRoute.to,
+  ],
   [Role.tenant]: [routes.TenantDashboardRoute.to],
   [Role.staff]: [],
 };
@@ -21,7 +25,9 @@ const useOnboarding = () => {
   const { data: user } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { data: society } = useQuery(getMySociety);
+  const { data: society } = useQuery(getMySociety, undefined, {
+    enabled: !!user,
+  });
 
   // redirecting user to onboarding process.
   useEffect(() => {

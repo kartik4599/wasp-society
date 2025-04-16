@@ -52,4 +52,6 @@ model Unit {
   building        Building @relation(fields: [buildingId], references: [id])
   allocatedUserId Int?
   allocatedTo     User?    @relation(fields: [allocatedUserId], references: [id])
+
+  @@unique([name, buildingId])
 }
