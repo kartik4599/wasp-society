@@ -17,15 +17,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { routes } from "wasp/client/router";
 
-export interface ParkingSpot {
-  id: string;
-  name: string;
-  type: ParkingType;
-  buildingId: string;
-  status: "assigned" | "available" | "maintenance";
-  assignedTo?: string;
-}
-
 const statusColors = {
   [RoomStatus.occupied]: "bg-green-500/30 border-green-500/50",
   [RoomStatus.available]: "bg-blue-500/30 border-blue-500/50",

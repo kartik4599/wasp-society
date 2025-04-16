@@ -33,7 +33,7 @@ interface BuildingList extends Building {
 }
 
 const DashboardBuilding = () => {
-  const { data, isLoading } = useQuery(getBuildingList) as {
+  const { data, isLoading } = useQuery(getBuildingList) as unknown as {
     data: BuildingList[];
     isLoading: boolean;
   };
