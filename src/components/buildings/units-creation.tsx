@@ -30,7 +30,7 @@ interface UnitsCreationProps {
   onBack: () => void;
 }
 
-const UNIT_TYPES: { value: UnitType; label: string }[] = [
+export const UNIT_TYPES: { value: UnitType; label: string }[] = [
   { value: "1rk", label: "1 RK" },
   { value: "1bhk", label: "1 BHK" },
   { value: "2bhk", label: "2 BHK" },

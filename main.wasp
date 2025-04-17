@@ -83,6 +83,15 @@ query getBuildingList{
   entities: [Society, Building, Unit]
 }
 
+crud Units {
+  entity: Unit,
+  operations: {
+    getAll: {},
+    create: {},
+    update: {},
+    delete: {}
+  },
+}
 
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{

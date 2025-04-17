@@ -3,15 +3,6 @@ import {
   type GetBuildingList,
 } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
-import { Building, Unit, User } from "wasp/entities";
-
-interface extendedUnit extends Unit {
-  allocatedTo: User;
-}
-
-export interface BuildingDetail extends Building {
-  Unit: extendedUnit;
-}
 
 export const getBuildingDetail: GetBuildingDetail<void> = async (_, ctx) => {
   const { Building, Society } = ctx.entities;
