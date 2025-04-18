@@ -12,12 +12,13 @@ import {
 } from "../../../components/ui/tooltip";
 import { RoomStatus } from "@prisma/client";
 import { useQuery, getBuildingDetail } from "wasp/client/operations";
-import { Unit, Building, User } from "wasp/entities";
+import { Unit } from "wasp/entities";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { routes } from "wasp/client/router";
 import { UnitDialog } from "./unit-dialog";
 import { Button } from "../../../components/ui/button";
+import { UnitDeatil } from "../../backend/building/querys";
 
 const statusColors = {
   [RoomStatus.occupied]: "bg-green-500/30 border-green-500/50",
@@ -26,31 +27,15 @@ const statusColors = {
   [RoomStatus.notAvailable]: "bg-gray-500/30 border-gray-500/50",
 };
 
-export interface UnitDeatil extends Unit {
-  allocatedTo?: User;
-}
-
-interface BuildingDetailType extends Building {
-  Unit: UnitDeatil[];
-}
-
 export function BuildingDetail() {
   const navigate = useNavigate();
   const [selectedUnit, setSelectedUnit] = useState<UnitDeatil | null>(null);
   const [newUnit, setNewUnit] = useState<null | number>(null);
 
-  const {
-    isLoading,
-    data: buildings,
-    refetch,
-  } = useQuery(getBuildingDetail) as unknown as {
-    isLoading: boolean;
-    data: BuildingDetailType[];
-    refetch: () => void;
-  };
+  const { isLoading, data: buildings, refetch } = useQuery(getBuildingDetail);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !buildings) return;
     if (buildings.length === 0) navigate(routes.CreateBuildingRoute.to);
   }, [isLoading, buildings]);
 

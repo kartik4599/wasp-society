@@ -93,6 +93,21 @@ crud Units {
   },
 }
 
+route TenentOnboardingRoute { path: "/tenant-on-boarding", to: TenentOnboarding }
+page TenentOnboarding {
+  component: import { TenentOnboarding } from "@src/owner/frontend/tenent-onboarding/tenent-onboarding-page"
+}
+
+query getTenantList{
+  fn: import { getTenantList } from "@src/owner/backend/tenent-onboarding/querys",
+  entities: [User]
+}
+
+action createTenant {
+  fn: import { createTenant } from "@src/owner/backend/tenent-onboarding/actions",
+  entities: [User, Unit, Agreement]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,

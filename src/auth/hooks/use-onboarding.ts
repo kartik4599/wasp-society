@@ -10,6 +10,7 @@ const userRoutes: Record<Role, string[]> = {
     routes.OwnerDashboardRoute.to,
     routes.CreateBuildingRoute.to,
     routes.DetailBuildingRoute.to,
+    routes.TenentOnboardingRoute.to,
   ],
   [Role.tenant]: [routes.TenantDashboardRoute.to],
   [Role.staff]: [],

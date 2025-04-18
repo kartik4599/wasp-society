@@ -8,7 +8,6 @@ import { Button } from "../../../components/ui/button";
 import { RoomStatus } from "@prisma/client";
 import { Label } from "../../../components/ui/label";
 import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group";
-import { UnitDeatil } from "./building-detail";
 import { Units } from "wasp/client/crud";
 import { CheckCheck, CircleSlash, Construction } from "lucide-react";
 import {
@@ -19,6 +18,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { UNIT_TYPES } from "../../../components/buildings/units-creation";
+import { UnitDeatil } from "../../backend/building/querys";
 
 interface UpdateUnitDialogProps {
   unit: UnitDeatil | null;

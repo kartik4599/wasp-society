@@ -38,7 +38,7 @@ export default function DashboardSidebar() {
         name: "Buildings",
         icon: Building2,
       },
-      { route: routes.OwnerDashboardRoute.to, name: "Tenants", icon: Users },
+      { route: routes.TenentOnboardingRoute.to, name: "Tenants", icon: Users },
       {
         route: routes.OwnerDashboardRoute.to,
         name: "Visitors",
@@ -119,7 +119,7 @@ export default function DashboardSidebar() {
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent className="">
+      <SidebarContent>
         <SidebarMenu>
           {sidebarItems[user.role].map(({ route, icon: Icon, name }) => {
             return (
