@@ -3,8 +3,21 @@ import {
   type GetBuildingList,
 } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
+import { Building, Unit, User } from "wasp/entities";
 
-export const getBuildingDetail: GetBuildingDetail<void> = async (_, ctx) => {
+export interface UnitDeatil extends Unit {
+  allocatedTo?: User;
+}
+
+export interface BuildingDetailType extends Building {
+  Unit: UnitDeatil[];
+  [key: string]: any;
+}
+
+export const getBuildingDetail: GetBuildingDetail<
+  void,
+  BuildingDetailType[]
+> = async (_, ctx) => {
   const { Building, Society } = ctx.entities;
   const user = ctx.user;
   if (!user) throw new HttpError(401, "Unauthorized");
@@ -18,7 +31,7 @@ export const getBuildingDetail: GetBuildingDetail<void> = async (_, ctx) => {
     orderBy: {},
   });
 
-  return buildings;
+  return buildings as BuildingDetailType[];
 };
 
 export const getBuildingList: GetBuildingList<void> = async (_, ctx) => {
