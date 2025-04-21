@@ -121,6 +121,8 @@ export default function TenantTable({ tenantList }: TenantTableProps) {
       if (window.innerWidth < 1000) return setShow(false);
       setShow(true);
     });
+    if (window.innerWidth < 1000) return setShow(false);
+    setShow(true);
   }, []);
 
   return (

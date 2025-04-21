@@ -6,19 +6,19 @@ import { useQuery, getTenentDetailList } from "wasp/client/operations";
 import TenantPaginationActions from "../../../components/tenants/tenant-pagination-actions";
 import { GetTenentDetailListArgs } from "../../../owner/backend/tenent-management/querys";
 import { Building } from "wasp/entities";
-import { Loading } from "../../../components/ui/loading";
 import { Button } from "../../../components/ui/button";
 import { UserPlus } from "lucide-react";
 import { Link, routes } from "wasp/client/router";
+import { useNavigate } from "react-router-dom";
 
 export function TenentManagement() {
   const [filters, setFilters] = useState<GetTenentDetailListArgs>({
     limit: 10,
     page: 1,
   });
-  const { data, isLoading } = useQuery(getTenentDetailList, filters);
-
+  const { data } = useQuery(getTenentDetailList, filters);
   const [buildings, setBuildings] = useState<Building[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!data?.buildings) return;
@@ -29,10 +29,17 @@ export function TenentManagement() {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
+  useEffect(() => {
+    if (!data?.tenantList) return;
+    if (data.tenantList.length === 0) {
+      return navigate(routes.TenentOnboardingRoute.to);
+    }
+  }, [navigate, data?.tenantList]);
+
   return (
-    <div className="container mx-auto max-w-7xl">
-      <div className="flex flex-col lg:flex-row gap-4 mb-6">
-        <div className="flex-1">
+    <div className=" mx-auto max-w-6xl w-full">
+      <div className="flex items-center justify-between flex-col lg:flex-row gap-4 mb-6">
+        <div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
             Tenant Management
           </h1>
@@ -47,7 +54,6 @@ export function TenentManagement() {
           </Button>
         </Link>
       </div>
-      {isLoading && <Loading />}
 
       <Card className="backdrop-blur-lg bg-white/30 border border-white/50 shadow-xl rounded-2xl p-6 mb-6">
         <TenantSearchFilters
