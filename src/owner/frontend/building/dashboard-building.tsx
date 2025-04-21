@@ -18,7 +18,7 @@ import {
 import { Building2 } from "lucide-react";
 import { routes } from "wasp/client/router";
 import { useQuery, getBuildingList } from "wasp/client/operations";
-import { Loading } from "../../../components/ui/locading";
+import { Loading } from "../../../components/ui/loading";
 import { Building } from "wasp/entities";
 import { useEffect, useState } from "react";
 
@@ -71,7 +71,7 @@ const DashboardBuilding = () => {
           />
         ) : (
           <div className="rounded-lg border overflow-hidden ">
-            <Table className="border-collapse">
+            <Table className="border-collapse bg-white/40">
               <TableHeader>
                 <TableRow className="border-b border-white/20 hover:bg-transparent">
                   <TableHead className="h-12 px-4 text-left align-middle font-medium ">

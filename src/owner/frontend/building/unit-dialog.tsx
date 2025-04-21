@@ -55,6 +55,8 @@ export const UnitDialog: React.FC<UpdateUnitDialogProps> = ({
   };
 
   const handleUpdate = async () => {
+    if (unit?.status === RoomStatus.occupied) return;
+
     await updateUnit({
       name: unitName,
       status: status,
@@ -66,20 +68,20 @@ export const UnitDialog: React.FC<UpdateUnitDialogProps> = ({
   };
 
   const handleDelete = () => {
-    if (unit?.status !== RoomStatus.occupied) {
-      deleteUnit({ id: unit?.id });
-      refetch();
+    if (unit?.status === RoomStatus.occupied) return;
 
-      onClose();
-    }
+    deleteUnit({ id: unit?.id });
+    refetch();
+
+    onClose();
   };
 
   useEffect(() => {
-    if (unit) {
-      setUnitName(unit.name);
-      setStatus(unit.status);
-      setUnitType(unit.type);
-    }
+    if (!unit) return;
+
+    setUnitName(unit.name);
+    setStatus(unit.status);
+    setUnitType(unit.type);
 
     return () => {
       setUnitName("");
@@ -119,57 +121,59 @@ export const UnitDialog: React.FC<UpdateUnitDialogProps> = ({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Status:</Label>
-            <RadioGroup
-              value={status}
-              onValueChange={(value: RoomStatus) => setStatus(value)}
-              className="grid gap-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={RoomStatus.available}
-                  id={RoomStatus.available}
-                  className="text-white border-emerald-400 fill-emerald-400"
-                />
-                <Label
-                  className="flex items-center text-emerald-400/80"
-                  htmlFor={RoomStatus.available}
-                >
-                  <CheckCheck className="size-5 mr-1" />
-                  Available
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={RoomStatus.underMaintenance}
-                  id={RoomStatus.underMaintenance}
-                  className="text-white border-amber-400 fill-amber-400"
-                />
-                <Label
-                  htmlFor={RoomStatus.underMaintenance}
-                  className="flex items-center text-amber-400/80"
-                >
-                  <Construction className="size-5 mr-1" />
-                  Under Maintenance
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={RoomStatus.notAvailable}
-                  id={RoomStatus.notAvailable}
-                  className="text-white border-rose-400 fill-rose-400"
-                />
-                <Label
-                  htmlFor={RoomStatus.notAvailable}
-                  className="flex items-center text-rose-400/80"
-                >
-                  <CircleSlash className="size-5 mr-1" />
-                  Not Available
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
+          {unit?.status !== RoomStatus.occupied && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Status:</Label>
+              <RadioGroup
+                value={status}
+                onValueChange={(value: RoomStatus) => setStatus(value)}
+                className="grid gap-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={RoomStatus.available}
+                    id={RoomStatus.available}
+                    className="text-white border-emerald-400 fill-emerald-400"
+                  />
+                  <Label
+                    className="flex items-center text-emerald-400/80"
+                    htmlFor={RoomStatus.available}
+                  >
+                    <CheckCheck className="size-5 mr-1" />
+                    Available
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={RoomStatus.underMaintenance}
+                    id={RoomStatus.underMaintenance}
+                    className="text-white border-amber-400 fill-amber-400"
+                  />
+                  <Label
+                    htmlFor={RoomStatus.underMaintenance}
+                    className="flex items-center text-amber-400/80"
+                  >
+                    <Construction className="size-5 mr-1" />
+                    Under Maintenance
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={RoomStatus.notAvailable}
+                    id={RoomStatus.notAvailable}
+                    className="text-white border-rose-400 fill-rose-400"
+                  />
+                  <Label
+                    htmlFor={RoomStatus.notAvailable}
+                    className="flex items-center text-rose-400/80"
+                  >
+                    <CircleSlash className="size-5 mr-1" />
+                    Not Available
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
 
           {isNew ? (
             <div className="flex gap-2 justify-end">

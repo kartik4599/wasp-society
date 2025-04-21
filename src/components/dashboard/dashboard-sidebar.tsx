@@ -38,7 +38,7 @@ export default function DashboardSidebar() {
         name: "Buildings",
         icon: Building2,
       },
-      { route: routes.TenentOnboardingRoute.to, name: "Tenants", icon: Users },
+      { route: routes.TenentManagementRoute.to, name: "Tenants", icon: Users },
       {
         route: routes.OwnerDashboardRoute.to,
         name: "Visitors",

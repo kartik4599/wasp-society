@@ -108,6 +108,17 @@ action createTenant {
   entities: [User, Unit, Agreement]
 }
 
+route TenentManagementRoute { path: "/tenent-management", to: TenentManagement }
+page TenentManagement {
+  component: import { TenentManagement } from "@src/owner/frontend/tenent-management/tenent-management-page"
+}
+
+query getTenentDetailList{
+  fn: import { getTenentDetailList } from "@src/owner/backend/tenent-management/querys",
+  entities: [Unit, Building]
+}
+
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,

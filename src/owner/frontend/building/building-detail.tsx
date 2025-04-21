@@ -1,4 +1,4 @@
-import { Loading } from "../../../components/ui/locading";
+import { Loading } from "../../../components/ui/loading";
 import {
   Card,
   CardContent,
@@ -126,7 +126,7 @@ export function BuildingDetail() {
                         Type: {type.toUpperCase()}
                       </h3>
                       <div
-                        className={`p-3 rounded-lg bg-white/10 border border-white/10 shadow`}
+                        className={`p-3 rounded-lg bg-white/30 border shadow`}
                       >
                         <div className="flex flex-wrap gap-2">
                           {units.map((unit) => (
