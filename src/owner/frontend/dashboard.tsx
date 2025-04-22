@@ -18,6 +18,7 @@ import {
 import { Button } from "../../components/ui/button";
 import EmptyState from "../../components/dashboard/empty-state";
 import DashboardBuilding from "./building/dashboard-building";
+import DashboardTenantlist from "./tenent-management/dashboard-tenantlist";
 
 // Mock data - in a real app, this would come from an API
 export const MOCK_DATA = {
@@ -97,65 +98,7 @@ export function OwnerDashboard() {
       {/* Buildings Section */}
       <DashboardBuilding />
       {/* Tenants Section */}
-      <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle className="text-xl font-semibold">Tenants</CardTitle>
-            <CardDescription>Manage your property tenants</CardDescription>
-          </div>
-          <Button size="sm" className="bg-green-500 hover:bg-green-600">
-            <Plus className="h-4 w-4 mr-1" /> Add Tenant
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {MOCK_DATA.tenants.length === 0 ? (
-            <EmptyState
-              title="No tenants added yet"
-              description="Add your first tenant to start managing your property"
-              icon={<Users className="h-12 w-12" />}
-              actionLabel="Add Tenant"
-            />
-          ) : (
-            <div className="rounded-md border bg-white/50">
-              <div className="p-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-sm text-gray-500">
-                      <th className="pb-2">Name</th>
-                      <th className="pb-2">Unit</th>
-                      <th className="pb-2">Status</th>
-                      <th className="pb-2 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MOCK_DATA.tenants.map((tenant) => (
-                      <tr key={tenant.id} className="border-t border-gray-100">
-                        <td className="py-3">{tenant.name}</td>
-                        <td className="py-3">{tenant.unit}</td>
-                        <td className="py-3">
-                          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                            {tenant.status}
-                          </span>
-                        </td>
-                        <td className="py-3 text-right">
-                          <Button variant="ghost" size="sm">
-                            View
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between border-t border-white/20 pt-4">
-          <Button variant="outline" size="sm" className="bg-white/50">
-            View All Tenants
-          </Button>
-        </CardFooter>
-      </Card>
+      <DashboardTenantlist />
 
       {/* Visitors Section */}
       <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
