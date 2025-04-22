@@ -32,9 +32,11 @@ const DashboardTenantlist = () => {
           <CardTitle className="text-xl font-semibold">Tenants</CardTitle>
           <CardDescription>Manage your property tenants</CardDescription>
         </div>
-        <Button size="sm" className="bg-green-500 hover:bg-green-600">
-          <Plus className="h-4 w-4 mr-1" /> Add Tenant
-        </Button>
+        <Link to={routes.TenentOnboardingRoute.to}>
+          <Button size="sm" className="bg-green-500 hover:bg-green-600">
+            <Plus className="h-4 w-4 mr-1" /> Add Tenant
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent>
         {data?.tenantList.length === 0 ? (

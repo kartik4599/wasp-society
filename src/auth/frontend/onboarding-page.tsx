@@ -10,7 +10,10 @@ import {
   updateUserDetail,
   useQuery,
   getMySociety,
+  getMyPersonalDetail,
 } from "wasp/client/operations";
+import PersonalInformation from "./personal-information";
+import AdditionalInformation from "./additional-information";
 
 export type UserData = {
   role: Role | null;
@@ -21,6 +24,7 @@ export type UserData = {
 export const OnboardingPage = () => {
   const { data: user } = useAuth();
   const { data: society } = useQuery(getMySociety);
+  const { data: personalDetail } = useQuery(getMyPersonalDetail);
 
   const [step, setStep] = useState(1);
   const [userData, setUserData] = useState<UserData>({
@@ -69,14 +73,31 @@ export const OnboardingPage = () => {
         );
       case 3:
         switch (userData.role) {
-          case "owner":
+          case Role.owner:
             return (
-              <PropertyOwnerDetails onNext={handleNext} onBack={handleBack} />
+              <PropertyOwnerDetails
+                onNext={handleNext.bind(null, true)}
+                onBack={handleBack}
+              />
             );
           default:
-            return <SuccessStep userData={userData} />;
+            return (
+              <PersonalInformation
+                onNext={handleNext.bind(null, true)}
+                onBack={handleBack}
+              />
+            );
         }
       case 4:
+        switch (userData.role) {
+          case Role.owner:
+            return <SuccessStep userData={userData} />;
+          default:
+            return (
+              <AdditionalInformation onNext={handleNext} onBack={handleBack} />
+            );
+        }
+      case 5:
         return <SuccessStep userData={userData} />;
       default:
         return null;
@@ -94,9 +115,17 @@ export const OnboardingPage = () => {
     });
 
     if (user.name && user.phoneNumber) setStep(3);
-
-    if (user.role === "owner" && society) setStep(4);
-  }, [user, society]);
+    if (user.role === Role.owner && society) setStep(4);
+    if (user.role === Role.tenant && personalDetail?.personalInformation)
+      setStep(4);
+    if (user.role === Role.tenant && personalDetail?.additionalInformation)
+      setStep(5);
+  }, [
+    user?.id,
+    society?.id,
+    personalDetail?.additionalInformation?.id,
+    personalDetail?.personalInformation?.id,
+  ]);
 
   return (
     <Card className="w-full mt-10 mx-auto max-w-md md:max-w-4xl p-8 backdrop-blur-lg bg-white/30 border border-white/50 shadow-xl rounded-2xl">

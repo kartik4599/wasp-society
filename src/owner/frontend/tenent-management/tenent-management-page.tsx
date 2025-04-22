@@ -29,13 +29,6 @@ export function TenentManagement() {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
-  useEffect(() => {
-    if (!data?.tenantList) return;
-    if (data.tenantList.length === 0) {
-      return navigate(routes.TenentOnboardingRoute.to);
-    }
-  }, [navigate, data?.tenantList]);
-
   return (
     <div className=" mx-auto max-w-6xl w-full">
       <div className="flex items-center justify-between flex-col lg:flex-row gap-4 mb-6">

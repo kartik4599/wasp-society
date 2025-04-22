@@ -2,6 +2,7 @@ import { Button } from "../../components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { UserData } from "./onboarding-page";
 import { Link, routes } from "wasp/client/router";
+import { Role } from "@prisma/client";
 
 interface SuccessStepProps {
   userData: UserData;
@@ -17,11 +18,11 @@ export default function SuccessStep({ userData }: SuccessStepProps) {
 
   const getRoleText = () => {
     switch (userData.role) {
-      case "owner":
+      case Role.owner:
         return "property owner";
-      case "tenant":
+      case Role.tenant:
         return "tenant";
-      case "staff":
+      case Role.staff:
         return "security staff member";
       default:
         return "user";

@@ -50,6 +50,22 @@ query getMySociety{
   entities: [Society]
 }
 
+query getMyPersonalDetail{
+  fn: import { getMyPersonalDetail } from "@src/tenant/backend/querys",
+  entities: [PersonalInformation, AdditionalInformation]
+}
+
+action saveMyPersonalDetail{
+  fn: import { saveMyPersonalDetail } from "@src/auth/backend/actions",
+  entities: [PersonalInformation]
+}
+
+action saveMyAdditionalDetail{
+  fn: import { saveMyAdditionalDetail } from "@src/auth/backend/actions",
+  entities: [AdditionalInformation, MemberInformation]
+}
+
+
 route OwnerDashboardRoute { path: "/owner", to: OwnerDashboard }
 page OwnerDashboard{
   authRequired: true,
@@ -118,6 +134,11 @@ query getTenentDetailList{
   entities: [Unit, Building]
 }
 
+
+// route TenantDetailPageRoute { path: "/tenent-detail/:tenentId", to: TenantDetailPage }
+// page TenantDetailPage {
+//   component: import { TenantDetailPage } from "@src/owner/frontend/tenent-detail/tenent-detail"
+// }
 
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
