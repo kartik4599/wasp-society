@@ -25,6 +25,22 @@ enum AgreementType {
   buy
 }
 
+enum IdentityType {
+  aadhaar
+  passport
+  drivingLicense
+  panCard
+  voterId
+  rationCard
+  other
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String?
@@ -32,12 +48,51 @@ model User {
   role        Role?
   name        String?
   phoneNumber String?
-  Society     Society?
-  Unit        Unit[]
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
 
-  updatedAt DateTime    @updatedAt
-  createdAt DateTime    @default(now())
-  Agreement Agreement[]
+  Society               Society?
+  Unit                  Unit[]
+  Agreement             Agreement[]
+  PersonalInformation   PersonalInformation?
+  AdditionalInformation AdditionalInformation?
+  MemberInformation     MemberInformation[]
+}
+
+model PersonalInformation {
+  id                      Int           @id @default(autoincrement())
+  dob                     DateTime
+  gender                  Gender
+  primaryIdentityType     IdentityType
+  primaryIdentityNumber   String
+  secondaryIdentityType   IdentityType?
+  secondaryIdentityNumber String?
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdditionalInformation {
+  id                     Int     @id @default(autoincrement())
+  alternativePhoneNumber String?
+  alternativeEmail       String?
+  emergencyContactNumber String
+  emergencyContactName   String
+  occupation             String
+  organizationName       String?
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MemberInformation {
+  id       Int      @id @default(autoincrement())
+  name     String
+  relation String
+  dob      DateTime
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Society {
@@ -97,7 +152,7 @@ model Agreement {
   updatedAt     DateTime      @updatedAt
 
   tenantId Int
-  tenant   User @relation(fields: [tenantId], references: [id])
+  tenant   User @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   unitId Int
   unit   Unit @relation(fields: [unitId], references: [id])
