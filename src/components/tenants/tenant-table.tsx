@@ -23,9 +23,9 @@ import {
   MoreHorizontal,
   ChevronUp,
   ChevronDown,
-  Car,
   Phone,
   Mail,
+  EyeIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -38,6 +38,7 @@ import {
 import { TenantListDetail } from "../../owner/backend/tenent-management/querys";
 import { format } from "date-fns";
 import { AgreementType } from "@prisma/client";
+import { Link, routes } from "wasp/client/router";
 
 interface TenantTableProps {
   tenantList: TenantListDetail[];
@@ -71,10 +72,6 @@ export default function TenantTable({ tenantList }: TenantTableProps) {
 
     return 0;
   });
-
-  const handleViewTenant = (tenantId: number) => {
-    // router.push(`/dashboard/tenants/${tenantId}`);
-  };
 
   const handleEditTenant = (tenantId: number) => {
     // router.push(`/dashboard/tenants/${tenantId}/edit`);
@@ -222,13 +219,17 @@ export default function TenantTable({ tenantList }: TenantTableProps) {
                 return (
                   <TableRow key={tenant.id} className="hover:bg-white/30">
                     <TableCell className="font-medium">
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
-                        onClick={() => handleViewTenant(tenant.id)}
+                      <Link
+                        to={routes.TenantDetailPageRoute.to}
+                        params={{ tenentId: tenant.id }}
                       >
-                        {tenant.tenantName}
-                      </Button>
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
+                        >
+                          {tenant.tenantName}
+                        </Button>
+                      </Link>
                       {tenant.createdAt && (
                         <div className="text-xs text-gray-500">
                           Since {format(tenant.createdAt, "dd MMM yyyy")}
@@ -319,43 +320,14 @@ export default function TenantTable({ tenantList }: TenantTableProps) {
                       )}
                     </TableCell> */}
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => handleViewTenant(tenant.id)}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleEditTenant(tenant.id)}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Tenant
-                          </DropdownMenuItem>
-                          {tenant.dueDate && (
-                            <DropdownMenuItem
-                              onClick={() => handleSendReminder(tenant)}
-                            >
-                              <Send className="h-4 w-4 mr-2" />
-                              Send Reminder
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteTenant(tenant)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Remove Tenant
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Link
+                        to={routes.TenantDetailPageRoute.to}
+                        params={{ tenentId: tenant.id }}
+                      >
+                        <Button size={"icon"} variant="ghost">
+                          <EyeIcon />
+                        </Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 );
