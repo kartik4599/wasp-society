@@ -117,7 +117,7 @@ export default function TenantDetails({
             <h3 className="font-medium text-gray-800 mb-2">
               Tenant Information
             </h3>
-            <div className="grid grid-cols-1 gap-2 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
               <div>
                 <span className="text-gray-500">Name:</span>{" "}
                 {formData?.tenant?.name}
@@ -129,6 +129,14 @@ export default function TenantDetails({
               <div>
                 <span className="text-gray-500">Phone:</span>{" "}
                 {formData?.tenant?.phoneNumber}
+              </div>
+              <div>
+                <span className="text-gray-500">Occupation:</span>{" "}
+                {formData?.tenant?.AdditionalInformation?.occupation}
+              </div>
+              <div>
+                <span className="text-gray-500">Total additional members:</span>{" "}
+                {formData?.tenant?.MemberInformation.length}
               </div>
             </div>
           </div>
