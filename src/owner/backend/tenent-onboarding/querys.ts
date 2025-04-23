@@ -1,12 +1,15 @@
 import { Prisma, Role } from "@prisma/client";
 import { type GetTenantList } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
+import { MemberInformation } from "wasp/entities";
 
 export interface tenant {
   name: string | null;
   id: number;
   email: string | null;
   phoneNumber: string | null;
+  AdditionalInformation: { occupation: string } | null;
+  MemberInformation: MemberInformation[];
   [key: string]: any;
 }
 
@@ -33,7 +36,14 @@ export const getTenantList: GetTenantList<
   const tenants = await User.findMany({
     take: 10,
     where: { role: Role.tenant, ...searchQuery },
-    select: { id: true, name: true, phoneNumber: true, email: true },
+    select: {
+      id: true,
+      name: true,
+      phoneNumber: true,
+      email: true,
+      AdditionalInformation: { select: { occupation: true } },
+      MemberInformation: true,
+    },
   });
 
   return tenants;
