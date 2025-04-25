@@ -16,7 +16,7 @@ const userRoutes: Record<Role, string[]> = {
     routes.DetailBuildingRoute.to.split("/")[1],
     routes.TenentOnboardingRoute.to.split("/")[1],
     routes.TenentManagementRoute.to.split("/")[1],
-    // routes.TenantDetailPageRoute.to.split("/")[1],
+    routes.TenantDetailPageRoute.to.split("/")[1],
   ],
   [Role.tenant]: [routes.TenantDashboardRoute.to.split("/")[1]],
   [Role.staff]: [],

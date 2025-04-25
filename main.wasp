@@ -134,11 +134,15 @@ query getTenentDetailList{
   entities: [Unit, Building]
 }
 
+route TenantDetailPageRoute { path: "/tenent-detail/:tenentId", to: TenantDetailPage }
+page TenantDetailPage {
+  component: import { TenantDetailPage } from "@src/owner/frontend/tenent-detail/tenent-detail"
+}
 
-// route TenantDetailPageRoute { path: "/tenent-detail/:tenentId", to: TenantDetailPage }
-// page TenantDetailPage {
-//   component: import { TenantDetailPage } from "@src/owner/frontend/tenent-detail/tenent-detail"
-// }
+query getTenantProfileByUnitId{
+  fn: import { getTenantProfileByUnitId } from "@src/owner/backend/tenant-detail/querys",
+  entities: [Unit, User]
+}
 
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
@@ -146,12 +150,3 @@ page TenantDashboard{
   component: import { TenantDashboard } from "@src/tenant/frontend/dashboard.tsx"
 }
 
-// action updateTask {
-//   fn: import { updateTask } from "@src/tasks/actions",
-//   entities: [Task]
-// }
-
-// action deleteTasks {
-//   fn: import { deleteTasks } from "@src/tasks/actions",
-//   entities: [Task],
-// }

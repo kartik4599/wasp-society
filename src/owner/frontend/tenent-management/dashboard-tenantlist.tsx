@@ -102,7 +102,10 @@ const DashboardTenantlist = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right p-4 align-baseline">
-                        <Link to={("/tenent-detail/" + tenant.id) as any}>
+                        <Link
+                          to={routes.TenantDetailPageRoute.to}
+                          params={{ tenentId: tenant.id }}
+                        >
                           <Eye className="size-5 text-gray-500 cursor-pointer hover:text-gray-700" />
                         </Link>
                       </TableCell>
