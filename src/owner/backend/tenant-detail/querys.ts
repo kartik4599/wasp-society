@@ -1,10 +1,14 @@
-import { GetTenantProfileByUnitId } from "wasp/server/operations";
+import {
+  type GetTenantProfileByUnitId,
+  type GetTenantAgreementByUnitId,
+} from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 import {
   User,
   AdditionalInformation,
   PersonalInformation,
   MemberInformation,
+  Agreement,
 } from "wasp/entities";
 
 export interface userProfile extends User {
@@ -63,4 +67,33 @@ export const getTenantProfileByUnitId: GetTenantProfileByUnitId<
   if (!userProfile) throw new HttpError(404, "User not found");
 
   return { userProfile, unitDetail };
+};
+
+export const getTenantAgreementByUnitId: GetTenantAgreementByUnitId<
+  { id: string },
+  Agreement
+> = async ({ id }, ctx) => {
+  const user = ctx.user;
+  if (!user || !id)
+    throw new HttpError(401, "User not authenticated or ID not provided");
+
+  const { Unit, Agreement } = ctx.entities;
+
+  const unitDetail = await Unit.findUnique({
+    where: { id: Number(id), building: { society: { createdById: user.id } } },
+  });
+
+  if (!unitDetail || !unitDetail.allocatedUserId)
+    throw new HttpError(404, "Unit not found");
+
+  const agreement = await Agreement.findFirst({
+    where: {
+      unitId: unitDetail.id,
+      tenantId: unitDetail.allocatedUserId,
+    },
+  });
+
+  if (!agreement) throw new HttpError(404, "Agreement not found");
+
+  return agreement;
 };

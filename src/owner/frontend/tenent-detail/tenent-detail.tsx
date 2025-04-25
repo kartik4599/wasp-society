@@ -310,7 +310,7 @@ export function TenantDetailPage() {
             </TabsContent>
 
             <TabsContent value="agreement">
-              <TenantAgreement tenant={tenant} />
+              <TenantAgreement />
             </TabsContent>
 
             <TabsContent value="payments">

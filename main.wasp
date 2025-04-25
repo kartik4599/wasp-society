@@ -144,6 +144,11 @@ query getTenantProfileByUnitId{
   entities: [Unit, User]
 }
 
+query getTenantAgreementByUnitId{
+  fn: import { getTenantAgreementByUnitId } from "@src/owner/backend/tenant-detail/querys",
+  entities: [Unit, Agreement]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,

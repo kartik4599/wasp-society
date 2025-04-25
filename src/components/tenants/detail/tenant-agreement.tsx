@@ -1,47 +1,30 @@
 import { Card, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
-import {
-  Calendar,
-  FileText,
-  Download,
-  Clock,
-  AlertTriangle,
-} from "lucide-react";
+import { Calendar, FileText, Download, AlertTriangle } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { getTenantAgreementByUnitId, useQuery } from "wasp/client/operations";
+import { AgreementType } from "@prisma/client";
+import { format, intervalToDuration } from "date-fns";
 
-interface TenantAgreementProps {
-  tenant: any;
-}
+export default function TenantAgreement() {
+  const { tenentId } = useParams();
+  const { data: tenantAgreement } = useQuery(getTenantAgreementByUnitId, {
+    id: tenentId || "",
+  });
 
-export default function TenantAgreement({ tenant }: TenantAgreementProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  if (!tenantAgreement) return;
 
-  const calculateDaysRemaining = () => {
-    if (!tenant.agreementEndDate) return null;
+  const interval = tenantAgreement.endDate
+    ? intervalToDuration({
+        start: tenantAgreement.startDate,
+        end: tenantAgreement.endDate,
+      })
+    : null;
 
-    const today = new Date();
-    const endDate = new Date(tenant.agreementEndDate);
-    const diffTime = endDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return diffDays;
-  };
-
-  const daysRemaining = calculateDaysRemaining();
   const isExpiringSoon =
-    daysRemaining !== null && daysRemaining <= 30 && daysRemaining > 0;
-  const isExpired = daysRemaining !== null && daysRemaining <= 0;
-
-  // Find the agreement document
-  const agreementDoc = tenant.documents.find(
-    (doc: any) => doc.type === "agreement"
-  );
+    interval?.days && interval.days <= 30 && interval.days > 0;
+  const isExpired = interval?.days && interval.days <= 0;
 
   return (
     <div className="space-y-6">
@@ -57,14 +40,14 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                 </h3>
                 <Badge
                   className={
-                    tenant.agreementType === "rent"
+                    tenantAgreement.agreementType === AgreementType.rent
                       ? "bg-blue-500"
-                      : tenant.agreementType === "buy"
+                      : tenantAgreement.agreementType === AgreementType.buy
                       ? "bg-purple-500"
                       : ""
                   }
                 >
-                  {tenant.agreementType === "rent"
+                  {tenantAgreement.agreementType === AgreementType.rent
                     ? "Rental Agreement"
                     : "Purchase Agreement"}
                 </Badge>
@@ -76,15 +59,15 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                     <div className="text-gray-500 text-xs mb-1">Start Date</div>
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-blue-600" />
-                      {formatDate(tenant.agreementStartDate)}
+                      {format(tenantAgreement.startDate, "MMMM dd, yyyy")}
                     </div>
                   </div>
                   <div className="bg-white/30 p-3 rounded-md">
                     <div className="text-gray-500 text-xs mb-1">End Date</div>
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-blue-600" />
-                      {tenant.agreementEndDate
-                        ? formatDate(tenant.agreementEndDate)
+                      {tenantAgreement.endDate
+                        ? format(tenantAgreement.endDate, "MMMM dd, yyyy")
                         : "Not specified"}
                     </div>
                   </div>
@@ -102,14 +85,14 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                     <div>
                       {isExpired
                         ? `Agreement expired ${Math.abs(
-                            daysRemaining
+                            interval?.days || 0
                           )} days ago. Please renew the agreement.`
-                        : `Agreement expires in ${daysRemaining} days. Consider renewing soon.`}
+                        : `Agreement expires in ${interval?.days} days. Consider renewing soon.`}
                     </div>
                   </div>
                 )}
 
-                {tenant.agreementType === "rent" && (
+                {tenantAgreement.agreementType === AgreementType.rent && (
                   <>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="bg-white/30 p-3 rounded-md">
@@ -117,7 +100,7 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                           Monthly Rent
                         </div>
                         <div className="font-medium">
-                          ₹{tenant.rent.toLocaleString()}
+                          ₹{tenantAgreement.monthlyRent?.toLocaleString()}
                         </div>
                       </div>
                       <div className="bg-white/30 p-3 rounded-md">
@@ -125,7 +108,7 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                           Security Deposit
                         </div>
                         <div className="font-medium">
-                          ₹{tenant.securityDeposit.toLocaleString()}
+                          ₹{tenantAgreement.depositAmount?.toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -136,7 +119,7 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                           Maintenance Charge
                         </div>
                         <div className="font-medium">
-                          ₹{tenant.maintenanceCharge.toLocaleString()}
+                          ₹{tenantAgreement.maintenance?.toLocaleString()}
                         </div>
                       </div>
                       <div className="bg-white/30 p-3 rounded-md">
@@ -144,19 +127,9 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                           Rent Due Day
                         </div>
                         <div className="font-medium">
-                          {tenant.rentDueDay}th of every month
+                          {format(tenantAgreement.startDate, "do")} of every
+                          month
                         </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white/30 p-3 rounded-md">
-                      <div className="text-gray-500 text-xs mb-1">
-                        Notice Period
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2 text-blue-600" />
-                        {tenant.noticePeriod}{" "}
-                        {tenant.noticePeriod === 1 ? "month" : "months"}
                       </div>
                     </div>
                   </>
@@ -183,7 +156,7 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                 Terms & Conditions
               </h3>
               <div className="bg-white/30 p-4 rounded-md text-sm">
-                {tenant.agreementTerms || "No specific terms provided."}
+                {tenantAgreement.terms || "No specific terms provided."}
               </div>
             </CardContent>
           </Card>
@@ -198,7 +171,7 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                   <FileText className="h-5 w-5 mr-2 text-blue-600" />
                   Agreement Document
                 </h3>
-                {agreementDoc && (
+                {tenantAgreement.agreementFile && (
                   <Button variant="outline" size="sm" className="bg-white/50">
                     <Download className="h-4 w-4 mr-2" />
                     Download
@@ -206,17 +179,17 @@ export default function TenantAgreement({ tenant }: TenantAgreementProps) {
                 )}
               </div>
 
-              {agreementDoc ? (
+              {tenantAgreement.agreementFile ? (
                 <div className="bg-white/30 rounded-md border border-white/50 h-[500px] flex items-center justify-center">
                   {/* In a real app, this would be a document viewer */}
                   <div className="text-center p-6">
                     <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                     <h4 className="font-medium text-gray-700 mb-2">
-                      {agreementDoc.name}
+                      {tenantAgreement.agreementFile}
                     </h4>
                     <p className="text-sm text-gray-500 mb-4">
-                      {agreementDoc.fileType.toUpperCase()} •{" "}
-                      {agreementDoc.fileSize}
+                      {tenantAgreement.agreementFile.toUpperCase()} •{" "}
+                      {tenantAgreement.agreementFile}
                     </p>
                     <Button variant="outline" className="bg-white/50">
                       <svg
