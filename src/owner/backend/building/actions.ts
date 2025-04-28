@@ -14,7 +14,7 @@ export const createBuilding: CreateBuilding<Building[], void> = async (
   if (!society) throw new HttpError(401, "Unauthorized");
 
   await Promise.all(
-    args.map(({ name, floors, units }) =>
+    args.map(({ name, floors, units, parkingSpots }) =>
       Building.create({
         data: {
           name: name,
@@ -25,6 +25,15 @@ export const createBuilding: CreateBuilding<Building[], void> = async (
               name,
               type,
               floor,
+            })),
+          },
+          ParkingSlot: {
+            create: parkingSpots.map(({ name, buildingId, status, type }) => ({
+              name,
+              status,
+              buildingId,
+              type,
+              vehicleType: type,
             })),
           },
         },
