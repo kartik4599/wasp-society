@@ -41,6 +41,14 @@ enum Gender {
   Other
 }
 
+enum VehicleType {
+  CAR
+  BIKE
+  SCOOTER
+  EV
+  OTHER
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String?
@@ -57,6 +65,7 @@ model User {
   PersonalInformation   PersonalInformation?
   AdditionalInformation AdditionalInformation?
   MemberInformation     MemberInformation[]
+  ParkingSlot           ParkingSlot[]
 }
 
 model PersonalInformation {
@@ -116,8 +125,9 @@ model Building {
   society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
   Unit      Unit[]
 
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime      @default(now())
+  ParkingSlot ParkingSlot[]
 }
 
 model Unit {
@@ -131,9 +141,10 @@ model Unit {
   allocatedUserId Int?
   allocatedTo     User?      @relation(fields: [allocatedUserId], references: [id])
 
-  updatedAt DateTime    @updatedAt
-  createdAt DateTime    @default(now())
-  Agreement Agreement[]
+  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime      @default(now())
+  Agreement   Agreement[]
+  ParkingSlot ParkingSlot[]
 
   @@unique([name, buildingId])
 }
@@ -153,7 +164,24 @@ model Agreement {
 
   tenantId Int
   tenant   User @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  unitId   Int
+  unit     Unit @relation(fields: [unitId], references: [id])
+}
 
-  unitId Int
-  unit   Unit @relation(fields: [unitId], references: [id])
+model ParkingSlot {
+  id            String      @id @default(uuid())
+  name          String
+  status        RoomStatus
+  vehicleType   VehicleType
+  vehicleNumber String?
+  vehicleModal  String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  buildingId   Int
+  Building     Building @relation(fields: [buildingId], references: [id])
+  unitId       Int?
+  unit         Unit?    @relation(fields: [unitId], references: [id])
+  assignedToId Int?
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
 }
