@@ -5,9 +5,10 @@ import TenantDetails from "../../../components/tenants/onboarding/tenant-details
 import AgreementDetails from "../../../components/tenants/onboarding/agreement-details";
 import ReviewAndConfirm from "../../../components/tenants/onboarding/review-confirm";
 import SuccessStep from "../../../components/tenants/onboarding/success-step";
-import { Building2, CircleCheckBig, FileText, User } from "lucide-react";
+import MaintenanceAndParking from "../../../components/tenants/onboarding/maintenance-parking";
+import { Building2, CircleCheckBig, FileText, User, Car } from "lucide-react";
 import { cn } from "../../../lib/utils";
-import { Agreement } from "wasp/entities";
+import { Agreement, ParkingSlot } from "wasp/entities";
 import { BuildingDetailType, UnitDeatil } from "../../backend/building/querys";
 import { tenant } from "../../backend/tenent-onboarding/querys";
 import { createTenant } from "wasp/client/operations";
@@ -22,6 +23,9 @@ export interface TenantOnboardingData {
 
   // Step 3: Agreement Details
   agreement?: Partial<Agreement>;
+
+  // Step 4: Parking Details
+  parkingSlots?: Partial<ParkingSlot>[];
 
   // Step 4: Maintenance & Parking
   [key: string]: any;
@@ -43,11 +47,11 @@ const stages = [
     Icon: FileText,
     bg: "bg-purple-600",
   },
-  // {
-  //   name: "Charges & Parking",
-  //   Icon: CreditCard,
-  //   bg: "bg-purple-600",
-  // },
+  {
+    name: "Parking",
+    Icon: Car,
+    bg: "bg-yellow-400",
+  },
   {
     name: "Review Details",
     Icon: CircleCheckBig,
@@ -57,7 +61,9 @@ const stages = [
 
 export function TenentOnboarding() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<TenantOnboardingData>({});
+  const [formData, setFormData] = useState<TenantOnboardingData>({
+    parkingSlots: [],
+  });
 
   const updateFormData = (data: Partial<TenantOnboardingData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -77,10 +83,6 @@ export function TenentOnboarding() {
     await createTenant(formData);
     handleNext(); // Go to success step
   };
-
-  // const getSelectedParkingSpot = () => {
-  //   return parkingSpots.find((p) => p.id === formData.parkingSpotId);
-  // };
 
   const renderStep = () => {
     switch (step) {
@@ -110,21 +112,16 @@ export function TenentOnboarding() {
             onBack={handleBack}
           />
         );
-      // case 4:
-      //   return (
-      //     <MaintenanceAndParking
-      //       parkingSpots={parkingSpots.filter(
-      //         (p) =>
-      //           p.buildingId === formData.building?.id &&
-      //           p.status === "available"
-      //       )}
-      //       formData={formData}
-      //       updateFormData={updateFormData}
-      //       onNext={handleNext}
-      //       onBack={handleBack}
-      //     />
-      //   );
       case 4:
+        return (
+          <MaintenanceAndParking
+            formData={formData}
+            updateFormData={updateFormData}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        );
+      case 5:
         return (
           <ReviewAndConfirm
             formData={formData}
@@ -132,7 +129,7 @@ export function TenentOnboarding() {
             onBack={handleBack}
           />
         );
-      case 5:
+      case 6:
         return (
           <SuccessStep
             onAddAnother={() => {

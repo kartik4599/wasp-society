@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
@@ -12,9 +12,11 @@ import {
 import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
 import { Car, Bike, Ban } from "lucide-react";
 import { TenantOnboardingData } from "../../../owner/frontend/tenent-onboarding/tenent-onboarding-page";
+import { ParkingSlots } from "wasp/client/crud";
+import { ParkingSlot } from "wasp/entities";
+import { VehicleType } from "@prisma/client";
 
 interface MaintenanceAndParkingProps {
-  parkingSpots: any[];
   formData: TenantOnboardingData;
   updateFormData: (data: Partial<TenantOnboardingData>) => void;
   onNext: () => void;
@@ -22,66 +24,80 @@ interface MaintenanceAndParkingProps {
 }
 
 export default function MaintenanceAndParking({
-  parkingSpots,
   formData,
   updateFormData,
   onNext,
   onBack,
 }: MaintenanceAndParkingProps) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { data } = ParkingSlots.getAll.useQuery();
+  const [errors, setErrors] = useState<Record<string, string>[]>([]);
+  const [availableParkingSlot, setAvailableParkingSlot] = useState<
+    ParkingSlot[]
+  >([]);
 
-  const handleInputChange = (field: string, value: any) => {
-    updateFormData({ [field]: value });
+  const handleInputChange = (index: number, value: Partial<ParkingSlot>) => {
+    const parkingSlots = [...(formData?.parkingSlots || [])];
+    parkingSlots[index] = { ...parkingSlots[index], ...value };
+
+    updateFormData({ parkingSlots });
 
     // Clear error for this field if it exists
-    if (errors[field]) {
+    const key = Object.keys(value)[0];
+    if (errors[index]?.[key]) {
       const newErrors = { ...errors };
-      delete newErrors[field];
+      delete errors[index][key];
       setErrors(newErrors);
     }
   };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string>[] =
+      formData.parkingSlots?.map(() => ({})) || [];
 
-    if (!formData.maintenanceCharge && formData.maintenanceCharge !== 0) {
-      newErrors.maintenanceCharge = "Maintenance charge is required";
-    }
+    formData.parkingSlots?.forEach((parkingSlot, index) => {
+      if (!parkingSlot.id) {
+        newErrors[index].parkingSpotId = "Please select a parking spot";
+      }
 
-    if (
-      formData.vehicleType &&
-      formData.vehicleType !== "none" &&
-      !formData.parkingSpotId
-    ) {
-      newErrors.parkingSpotId = "Please select a parking spot";
-    }
+      if (!parkingSlot.vehicleType) {
+        newErrors[index].vehicleType = "Please select a vehicle type";
+      }
 
-    if (
-      (formData.vehicleType === "car" ||
-        formData.vehicleType === "bike" ||
-        formData.vehicleType === "both") &&
-      !formData.vehicleNumber?.trim()
-    ) {
-      newErrors.vehicleNumber = "Vehicle number is required";
-    }
+      if (!parkingSlot.vehicleNumber) {
+        newErrors[index].vehicleNumber = "Please enter a vehicle number";
+      }
+
+      if (!parkingSlot.vehicleModel) {
+        newErrors[index].vehicleModel = "Please enter a vehicle model";
+      }
+    });
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    let returnValue = true;
+
+    newErrors.forEach((error) => {
+      if (Object.keys(error).length > 0) {
+        returnValue = false;
+      }
+    });
+
+    return returnValue;
   };
 
   const handleNext = () => {
-    if (validateForm()) {
-      // If no vehicle, clear vehicle-related fields
-      if (formData.vehicleType === "none") {
-        updateFormData({
-          parkingSpotId: undefined,
-          vehicleNumber: undefined,
-        });
-      }
-
-      onNext();
-    }
+    if (validateForm()) onNext();
   };
+
+  useEffect(() => {
+    if (!data || !formData.building?.id) return;
+
+    const filteredSlots = data.filter(
+      ({ buildingId }) => formData.building?.id === buildingId
+    );
+
+    setAvailableParkingSlot(filteredSlots);
+  }, [data, , formData.building?.id]);
 
   return (
     <div className="space-y-6">
@@ -93,155 +109,27 @@ export default function MaintenanceAndParking({
           Set maintenance charges and allocate parking if needed
         </p>
       </div>
-
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="maintenance-charge">
-            Monthly Maintenance Charge (₹)
-          </Label>
-          <Input
-            id="maintenance-charge"
-            type="number"
-            placeholder="2500"
-            value={formData.maintenanceCharge ?? ""}
-            onChange={(e) =>
-              handleInputChange(
-                "maintenanceCharge",
-                e.target.value ? Number(e.target.value) : undefined
-              )
-            }
-            className={`bg-white/50 border ${
-              errors.maintenanceCharge ? "border-red-300" : "border-gray-200"
-            }`}
-          />
-          {errors.maintenanceCharge && (
-            <p className="text-sm text-red-500">{errors.maintenanceCharge}</p>
+      {formData.parkingSlots?.map((slot, index) => (
+        <ParkingSlotUnit
+          errors={errors[index] || {}}
+          handleInputChange={handleInputChange.bind(null, index)}
+          parkingSlots={slot}
+          key={index}
+          availableParkingSlot={availableParkingSlot.filter(
+            ({ vehicleType }) => vehicleType === slot.vehicleType
           )}
-        </div>
-
-        <div className="space-y-2">
-          <Label>Vehicle Type</Label>
-          <RadioGroup
-            value={formData.vehicleType || "none"}
-            onValueChange={(value) =>
-              handleInputChange(
-                "vehicleType",
-                value as "car" | "bike" | "both" | "none"
-              )
-            }
-            className="flex flex-wrap gap-4"
-          >
-            <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
-              <RadioGroupItem value="car" id="car" />
-              <Label htmlFor="car" className="cursor-pointer flex items-center">
-                <Car className="h-4 w-4 mr-2" />
-                Car
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
-              <RadioGroupItem value="bike" id="bike" />
-              <Label
-                htmlFor="bike"
-                className="cursor-pointer flex items-center"
-              >
-                <Bike className="h-4 w-4 mr-2" />
-                Bike
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
-              <RadioGroupItem value="both" id="both" />
-              <Label
-                htmlFor="both"
-                className="cursor-pointer flex items-center"
-              >
-                <div className="flex">
-                  <Car className="h-4 w-4 mr-1" />
-                  <Bike className="h-4 w-4 mr-2" />
-                </div>
-                Both
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
-              <RadioGroupItem value="none" id="none" />
-              <Label
-                htmlFor="none"
-                className="cursor-pointer flex items-center"
-              >
-                <Ban className="h-4 w-4 mr-2" />
-                No Vehicle
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
-
-        {formData.vehicleType && formData.vehicleType !== "none" && (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="parking-spot">Parking Spot</Label>
-              <Select
-                value={formData.parkingSpotId}
-                onValueChange={(value) =>
-                  handleInputChange("parkingSpotId", value)
-                }
-              >
-                <SelectTrigger
-                  id="parking-spot"
-                  className={`bg-white/50 border ${
-                    errors.parkingSpotId ? "border-red-300" : "border-gray-200"
-                  }`}
-                >
-                  <SelectValue placeholder="Select a parking spot" />
-                </SelectTrigger>
-                <SelectContent>
-                  {parkingSpots.length > 0 ? (
-                    parkingSpots.map((spot) => (
-                      <SelectItem key={spot.id} value={spot.id}>
-                        <div className="flex items-center">
-                          <Car className="h-4 w-4 mr-2 text-blue-500" />
-                          {spot.name} ({spot.type})
-                        </div>
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="none" disabled>
-                      No parking spots available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.parkingSpotId && (
-                <p className="text-sm text-red-500">{errors.parkingSpotId}</p>
-              )}
-
-              {parkingSpots.length === 0 && (
-                <p className="text-sm text-amber-600 mt-1">
-                  No parking spots available for this building. Please add
-                  parking spots first.
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="vehicle-number">Vehicle Number</Label>
-              <Input
-                id="vehicle-number"
-                placeholder="MH01AB1234"
-                value={formData.vehicleNumber || ""}
-                onChange={(e) =>
-                  handleInputChange("vehicleNumber", e.target.value)
-                }
-                className={`bg-white/50 border ${
-                  errors.vehicleNumber ? "border-red-300" : "border-gray-200"
-                }`}
-              />
-              {errors.vehicleNumber && (
-                <p className="text-sm text-red-500">{errors.vehicleNumber}</p>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-
+        />
+      ))}
+      <Button
+        onClick={() =>
+          updateFormData({
+            parkingSlots: [...(formData.parkingSlots || []), {}],
+          })
+        }
+        className="w-full bg-white/20 hover:bg-white/40 border border-gray-200 text-black"
+      >
+        Add Parking Slot
+      </Button>
       <div className="flex space-x-3 pt-4">
         <Button
           onClick={onBack}
@@ -260,3 +148,154 @@ export default function MaintenanceAndParking({
     </div>
   );
 }
+
+const ParkingSlotUnit = ({
+  parkingSlots,
+  errors,
+  handleInputChange,
+  availableParkingSlot,
+}: {
+  parkingSlots: Partial<ParkingSlot>;
+  errors: Record<string, string>;
+  handleInputChange: (value: Partial<ParkingSlot>) => void;
+  availableParkingSlot: ParkingSlot[];
+}) => {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Vehicle Type</Label>
+        <RadioGroup
+          value={parkingSlots.vehicleType}
+          onValueChange={(value: VehicleType) =>
+            handleInputChange({ vehicleType: value })
+          }
+          className={`flex flex-wrap gap-4 p-1 ${
+            errors.vehicleType ? "border-red-300" : ""
+          }`}
+        >
+          <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
+            <RadioGroupItem value={VehicleType.CAR} id={VehicleType.CAR} />
+            <Label
+              htmlFor={VehicleType.CAR}
+              className="cursor-pointer flex items-center"
+            >
+              <Car className="h-4 w-4 mr-2" />
+              Car
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
+            <RadioGroupItem value={VehicleType.BIKE} id={VehicleType.BIKE} />
+            <Label
+              htmlFor={VehicleType.BIKE}
+              className="cursor-pointer flex items-center"
+            >
+              <Bike className="h-4 w-4 mr-2" />
+              Bike
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
+            <RadioGroupItem value={VehicleType.EV} id={VehicleType.EV} />
+            <Label
+              htmlFor={VehicleType.EV}
+              className="cursor-pointer flex items-center"
+            >
+              <div className="flex">
+                <Car className="h-4 w-4 mr-1" />
+              </div>
+              EV
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
+            <RadioGroupItem
+              value={VehicleType.SCOOTER}
+              id={VehicleType.SCOOTER}
+            />
+            <Label
+              htmlFor={VehicleType.SCOOTER}
+              className="cursor-pointer flex items-center"
+            >
+              <Bike className="h-4 w-4 mr-2" />
+              Scooter
+            </Label>
+          </div>
+        </RadioGroup>
+        {errors.vehicleType && (
+          <p className="text-sm text-red-500">{errors.vehicleType}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="id">Parking Spot</Label>
+        <Select
+          value={parkingSlots?.id?.toString()}
+          onValueChange={(value) => handleInputChange({ id: Number(value) })}
+        >
+          <SelectTrigger
+            id="id"
+            className={`bg-white/50 border ${
+              errors.parkingSpotId ? "border-red-300" : "border-gray-200"
+            }`}
+          >
+            <SelectValue placeholder="Select a parking spot" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableParkingSlot.length > 0 ? (
+              availableParkingSlot.map((spot) => (
+                <SelectItem key={spot.id} value={spot.id.toString()}>
+                  <div className="flex items-center">
+                    <Car className="h-4 w-4 mr-2 text-blue-500" />
+                    {spot.name} ({spot.vehicleType})
+                  </div>
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="none" disabled>
+                No parking spots available
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
+        {errors.id && <p className="text-sm text-red-500">{errors.id}</p>}
+
+        {availableParkingSlot.length === 0 && (
+          <p className="text-sm text-amber-600 mt-1">
+            No parking spots available for this building. Please add parking
+            spots first.
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="vehicle-number">Vehicle Number</Label>
+        <Input
+          id="vehicle-number"
+          placeholder="MH01AB1234"
+          value={parkingSlots?.vehicleNumber || ""}
+          onChange={(e) => handleInputChange({ vehicleNumber: e.target.value })}
+          className={`bg-white/50 border ${
+            errors.vehicleNumber ? "border-red-300" : "border-gray-200"
+          }`}
+        />
+        {errors.vehicleNumber && (
+          <p className="text-sm text-red-500">{errors.vehicleNumber}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="vehicle-number">Vehicle Model Name</Label>
+        <Input
+          id="vehicle-number"
+          placeholder="Maruti Suzuki"
+          value={parkingSlots?.vehicleModel || ""}
+          onChange={(e) => handleInputChange({ vehicleModel: e.target.value })}
+          className={`bg-white/50 border ${
+            errors.vehicleModel ? "border-red-300" : "border-gray-200"
+          }`}
+        />
+        {errors.vehicleModel && (
+          <p className="text-sm text-red-500">{errors.vehicleNumber}</p>
+        )}
+      </div>
+    </div>
+  );
+};

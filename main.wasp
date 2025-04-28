@@ -121,7 +121,7 @@ query getTenantList{
 
 action createTenant {
   fn: import { createTenant } from "@src/owner/backend/tenent-onboarding/actions",
-  entities: [User, Unit, Agreement]
+  entities: [User, Unit, Agreement, ParkingSlot]
 }
 
 route TenentManagementRoute { path: "/tenent-management", to: TenentManagement }
@@ -162,6 +162,7 @@ query getBuildingParkingDetail {
 crud ParkingSlots {
   entity: ParkingSlot,
   operations: {
+    get: {},
     getAll: {},
     create: {},
     update: {},

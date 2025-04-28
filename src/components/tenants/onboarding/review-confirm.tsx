@@ -1,7 +1,7 @@
 import { Button } from "../../ui/button";
 import { Card, CardContent } from "../../ui/card";
 import { TenantOnboardingData } from "../../../owner/frontend/tenent-onboarding/tenent-onboarding-page";
-import { Building2, User, FileText, CheckCircle2 } from "lucide-react";
+import { Building2, User, FileText, CheckCircle2, Car } from "lucide-react";
 import { AgreementType } from "@prisma/client";
 import { format } from "date-fns";
 
@@ -16,15 +16,6 @@ export default function ReviewAndConfirm({
   onComplete,
   onBack,
 }: ReviewAndConfirmProps) {
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "Not specified";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   const formatCurrency = (amount?: number) => {
     if (amount === undefined) return "Not specified";
     return `₹${amount.toLocaleString()}`;
@@ -152,39 +143,36 @@ export default function ReviewAndConfirm({
         </Card>
 
         {/* Maintenance & Parking */}
-        {/* <Card className="backdrop-blur-sm bg-white/20 border border-white/50">
+        <Card className="backdrop-blur-sm bg-white/20 border border-white/50">
           <CardContent className="p-4">
             <div className="flex items-center mb-3">
-              <CreditCard className="h-5 w-5 mr-2 text-purple-600" />
-              <h3 className="font-medium">Charges & Parking</h3>
+              <Car className="h-5 w-5 mr-2 text-yellow-400" />
+              <h3 className="font-medium">Parking</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-gray-500">Monthly Maintenance:</span>{" "}
-                {formatCurrency(formData.maintenanceCharge)}
-              </div>
-              <div>
-                <span className="text-gray-500">Vehicle Type:</span>{" "}
-                {formData.vehicleType
-                  ? formData.vehicleType.charAt(0).toUpperCase() +
-                    formData.vehicleType.slice(1)
-                  : "None"}
-              </div>
-              {formData.vehicleType && formData.vehicleType !== "none" && (
-                <>
+            {formData.parkingSlots?.map((slot) => {
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Vehicle Type:</span>{" "}
+                    {slot.vehicleType}
+                  </div>
                   <div>
                     <span className="text-gray-500">Parking Spot:</span>{" "}
-                    {selectedParkingSpot?.name || "Not assigned"}
+                    {slot?.name || "Not assigned"}
                   </div>
                   <div>
                     <span className="text-gray-500">Vehicle Number:</span>{" "}
-                    {formData.vehicleNumber || "Not specified"}
+                    {slot.vehicleNumber || "Not specified"}
                   </div>
-                </>
-              )}
-            </div>
+                  <div>
+                    <span className="text-gray-500">Vehicle Number:</span>{" "}
+                    {slot.vehicleModel || "Not specified"}
+                  </div>
+                </div>
+              );
+            })}
           </CardContent>
-        </Card> */}
+        </Card>
       </div>
 
       <div className="flex space-x-3 pt-4">
