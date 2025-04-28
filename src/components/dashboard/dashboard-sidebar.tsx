@@ -39,6 +39,7 @@ export default function DashboardSidebar() {
         icon: Building2,
       },
       { route: routes.TenentManagementRoute.to, name: "Tenants", icon: Users },
+      { route: routes.ParkingPageRoute.to, name: "Parking", icon: Car },
       {
         route: routes.OwnerDashboardRoute.to,
         name: "Visitors",
@@ -49,7 +50,6 @@ export default function DashboardSidebar() {
         name: "Payments",
         icon: CreditCard,
       },
-      { route: routes.OwnerDashboardRoute.to, name: "Parking", icon: Car },
       {
         route: routes.OwnerDashboardRoute.to,
         name: "Notifications",

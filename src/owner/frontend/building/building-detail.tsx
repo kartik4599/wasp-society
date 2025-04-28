@@ -20,7 +20,7 @@ import { UnitDialog } from "./unit-dialog";
 import { Button } from "../../../components/ui/button";
 import { UnitDeatil } from "../../backend/building/querys";
 
-const statusColors = {
+export const statusColors = {
   [RoomStatus.occupied]: "bg-green-500/30 border-green-500/50",
   [RoomStatus.available]: "bg-blue-500/30 border-blue-500/50",
   [RoomStatus.underMaintenance]: "bg-amber-500/30 border-amber-500/50",
