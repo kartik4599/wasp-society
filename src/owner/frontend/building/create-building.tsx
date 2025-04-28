@@ -8,6 +8,8 @@ import UnitsCreation from "../../../components/buildings/units-creation";
 import BuildingConfirmation from "../../../components/buildings/building-confirmation";
 import { createBuilding } from "wasp/client/operations";
 import { useQuery, getBuildingDetail } from "wasp/client/operations";
+import ParkingCreation from "../../../components/buildings/parking-creation";
+import { VehicleType, RoomStatus } from "@prisma/client";
 
 export type BuildingType = "single" | "multiple";
 export type UnitType =
@@ -27,6 +29,7 @@ export interface Building {
   floors?: number;
   description?: string;
   units: Unit[];
+  parkingSpots: ParkingSpot[];
   [key: string]: any;
 }
 
@@ -36,6 +39,14 @@ export interface Unit {
   type: UnitType;
   floor?: number;
   buildingId: string;
+}
+
+export interface ParkingSpot {
+  id: string;
+  name: string;
+  type: VehicleType;
+  buildingId: string;
+  status: RoomStatus;
 }
 
 export function CreateBuilding() {
@@ -56,6 +67,7 @@ export function CreateBuilding() {
           id: "building-1",
           name: "Main Building",
           units: [],
+          parkingSpots: [],
         },
       ]);
       // Skip to step 3 (units creation)
@@ -75,9 +87,57 @@ export function CreateBuilding() {
     setBuildings(updatedBuildings);
   };
 
+  const handleParkingCreation = (updatedBuildings: Building[]) => {
+    setBuildings(updatedBuildings);
+  };
+
   const handleConfirmation = async () => {
     await createBuilding(buildings);
     navigate(routes.DetailBuildingRoute.to);
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return <BuildingTypeSelection onSelect={handleBuildingTypeSelect} />;
+      case 2:
+        return (
+          <MultipleBuildingsCreation
+            onNext={handleMultipleBuildingsCreation}
+            onBack={handleBack}
+          />
+        );
+      case 3:
+        return (
+          <UnitsCreation
+            buildings={buildings}
+            onNext={() => setStep(4)}
+            saveUnits={handleUnitsCreation}
+            onBack={handleBack}
+          />
+        );
+
+      case 4:
+        return (
+          <ParkingCreation
+            buildings={buildings}
+            onNext={() => setStep(5)}
+            saveParking={handleParkingCreation}
+            onBack={handleBack}
+          />
+        );
+
+      case 5:
+        return (
+          <BuildingConfirmation
+            buildings={buildings}
+            onConfirm={handleConfirmation}
+            onBack={handleBack}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   const handleBack = () => {
@@ -91,6 +151,7 @@ export function CreateBuilding() {
   useEffect(() => {
     if (data?.length) navigate(routes.DetailBuildingRoute.to);
   }, [data]);
+
   return (
     <div className="container mx-auto max-w-5xl ">
       <Card className="backdrop-blur-lg bg-white/30 border border-white/50 shadow-xl rounded-2xl p-6 md:p-8">
@@ -147,45 +208,34 @@ export function CreateBuilding() {
                 }`}
               ></div>
             </div>
+            <div className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  step >= 4
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                4
+              </div>
+              <div
+                className={`h-1 w-12 ${
+                  step >= 5 ? "bg-blue-500" : "bg-gray-200"
+                }`}
+              ></div>
+            </div>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step >= 4
+                step >= 5
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-500"
               }`}
             >
-              4
+              5
             </div>
           </div>
         </div>
-
-        {step === 1 && (
-          <BuildingTypeSelection onSelect={handleBuildingTypeSelect} />
-        )}
-
-        {step === 2 && (
-          <MultipleBuildingsCreation
-            onNext={handleMultipleBuildingsCreation}
-            onBack={handleBack}
-          />
-        )}
-
-        {step === 3 && (
-          <UnitsCreation
-            buildings={buildings}
-            onNext={() => setStep(4)}
-            saveUnits={handleUnitsCreation}
-            onBack={handleBack}
-          />
-        )}
-
-        {step === 4 && (
-          <BuildingConfirmation
-            buildings={buildings}
-            onConfirm={handleConfirmation}
-            onBack={handleBack}
-          />
-        )}
+        {renderStep()}
       </Card>
     </div>
   );

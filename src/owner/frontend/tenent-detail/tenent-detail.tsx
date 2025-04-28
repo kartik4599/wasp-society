@@ -197,7 +197,9 @@ const MOCK_TENANTS = [
 
 export function TenantDetailPage() {
   const { tenentId } = useParams();
-  const { data } = useQuery(getTenantProfileByUnitId, { id: tenentId || "" });
+  const { data, isLoading } = useQuery(getTenantProfileByUnitId, {
+    id: tenentId || "",
+  });
   const [tenant, setTenant] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -225,6 +227,8 @@ export function TenantDetailPage() {
     setShowDeleteDialog(false);
     // router.push("/dashboard/tenants")
   };
+
+  if (isLoading) return "Loading...";
 
   if (!data) {
     return (
@@ -255,14 +259,6 @@ export function TenantDetailPage() {
       </div>
 
       <div className="container mx-auto max-w-6xl">
-        <Button
-          variant="outline"
-          className="mr-4 bg-white/50"
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <div>
@@ -337,8 +333,8 @@ export function TenantDetailPage() {
           <DialogHeader>
             <DialogTitle>Confirm Tenant Removal</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove {tenant.name} from{" "}
-              {tenant.unitName}? This action cannot be undone.
+              Are you sure you want to remove {tenant?.name} from{" "}
+              {tenant?.unitName}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

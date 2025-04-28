@@ -21,6 +21,7 @@ export default function TenantProfile() {
               <AvatarImage
                 src={userProfile.picture || "/placeholder.svg"}
                 alt={userProfile.name || ""}
+                className="object-cover"
               />
               <AvatarFallback className="text-3xl bg-blue-100 text-blue-600">
                 {(userProfile.name || "")

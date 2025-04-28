@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Building2, Plus, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -24,6 +22,7 @@ export default function MultipleBuildingsCreation({
       floors: undefined,
       description: "",
       units: [],
+      parkingSpots: [],
     },
   ]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -37,6 +36,7 @@ export default function MultipleBuildingsCreation({
         floors: undefined,
         description: "",
         units: [],
+        parkingSpots: [],
       },
     ]);
   };

@@ -5,6 +5,7 @@ import {
   Building,
   UnitType,
 } from "../../owner/frontend//building/create-building";
+import { VehicleType } from "@prisma/client";
 
 interface BuildingConfirmationProps {
   buildings: Building[];
@@ -22,6 +23,14 @@ const UNIT_TYPE_LABELS: Record<UnitType, string> = {
   shop: "Shop",
   office: "Office",
   other: "Other",
+};
+
+const PARKING_TYPE_LABELS: Record<VehicleType, string> = {
+  CAR: "Car",
+  BIKE: "Bike",
+  SCOOTER: "Scooter",
+  EV: "EV",
+  OTHER: "Other",
 };
 
 export default function BuildingConfirmation({
@@ -45,6 +54,21 @@ export default function BuildingConfirmation({
       .map(
         ([type, count]) =>
           `${count} x ${UNIT_TYPE_LABELS[type as UnitType] || type}`
+      )
+      .join(", ");
+  };
+
+  const getParkingTypeCount = (building: Building) => {
+    const counts: Record<string, number> = {};
+
+    (building.parkingSpots || []).forEach((spot) => {
+      counts[spot.type] = (counts[spot.type] || 0) + 1;
+    });
+
+    return Object.entries(counts)
+      .map(
+        ([type, count]) =>
+          `${count} ${PARKING_TYPE_LABELS[type as VehicleType] || type}`
       )
       .join(", ");
   };
@@ -106,6 +130,12 @@ export default function BuildingConfirmation({
                   <span className="text-gray-500">Types:</span>{" "}
                   {getUnitTypeCount(building)}
                 </div>
+                {building.parkingSpots && building.parkingSpots.length > 0 && (
+                  <div className="col-span-2">
+                    <span className="text-gray-500">Parking Types:</span>{" "}
+                    {getParkingTypeCount(building)}
+                  </div>
+                )}
                 {building.description && (
                   <div className="col-span-2">
                     <span className="text-gray-500">Description:</span>{" "}
@@ -133,6 +163,27 @@ export default function BuildingConfirmation({
                               Floor: {unit.floor}
                             </div>
                           )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {building.parkingSpots && building.parkingSpots.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Parking Spots</h4>
+                  <div className="bg-white/10 rounded-lg border border-white/30 p-3">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {building.parkingSpots.map((spot) => (
+                        <div
+                          key={spot.id}
+                          className="p-2 bg-white/20 rounded border border-white/30 text-sm"
+                        >
+                          <span className="font-medium">{spot.name}</span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            ({PARKING_TYPE_LABELS[spot.type] || spot.type})
+                          </span>
                         </div>
                       ))}
                     </div>
