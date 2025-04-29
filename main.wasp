@@ -149,13 +149,18 @@ query getTenantAgreementByUnitId{
   entities: [Unit, Agreement]
 }
 
+query getTenantParkingByUnitId{
+  fn: import { getTenantParkingByUnitId } from "@src/owner/backend/tenant-detail/querys",
+  entities: [ParkingSlot]
+}
+
 route ParkingPageRoute { path: "/parking-detail", to: ParkingPage }
 page ParkingPage {
-  component: import {ParkingPage} from "@src/owner/frontend/parking/parking-page.tsx"
+  component: import { ParkingPage } from "@src/owner/frontend/parking/parking-page.tsx"
 }
 
 query getBuildingParkingDetail {
-  fn: import {getBuildingParkingDetail} from "@src/owner/backend/parking/querys.ts",
+  fn: import { getBuildingParkingDetail } from "@src/owner/backend/parking/querys.ts",
   entities: [Building, Society]
 }
 

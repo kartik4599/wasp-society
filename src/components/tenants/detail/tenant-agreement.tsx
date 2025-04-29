@@ -23,7 +23,10 @@ export default function TenantAgreement() {
     : null;
 
   const isExpiringSoon =
-    interval?.days && interval.days <= 30 && interval.days > 0;
+    !interval?.months &&
+    interval?.days &&
+    interval.days <= 30 &&
+    interval.days > 0;
   const isExpired = interval?.days && interval.days <= 0;
 
   return (

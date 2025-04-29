@@ -314,7 +314,10 @@ export function TenantDetailPage() {
             </TabsContent>
 
             <TabsContent value="parking">
-              <TenantParking tenant={tenant} />
+              <TenantParking
+                userId={userProfile.id}
+                buildingId={unitDetail.building.id}
+              />
             </TabsContent>
 
             <TabsContent value="documents">

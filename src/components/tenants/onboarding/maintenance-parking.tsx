@@ -10,11 +10,11 @@ import {
   SelectValue,
 } from "../../ui/select";
 import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
-import { Car, Bike, Ban } from "lucide-react";
+import { Car, Bike, CircleParking } from "lucide-react";
 import { TenantOnboardingData } from "../../../owner/frontend/tenent-onboarding/tenent-onboarding-page";
 import { ParkingSlots } from "wasp/client/crud";
 import { ParkingSlot } from "wasp/entities";
-import { VehicleType } from "@prisma/client";
+import { VehicleType, RoomStatus } from "@prisma/client";
 
 interface MaintenanceAndParkingProps {
   formData: TenantOnboardingData;
@@ -22,6 +22,14 @@ interface MaintenanceAndParkingProps {
   onNext: () => void;
   onBack: () => void;
 }
+
+export const VehicleIcons = {
+  [VehicleType.CAR]: <Car className="h-4 w-4 mr-2" />,
+  [VehicleType.BIKE]: <Bike className="h-4 w-4 mr-2" />,
+  [VehicleType.EV]: <Car className="h-4 w-4 mr-2" />,
+  [VehicleType.SCOOTER]: <Bike className="h-4 w-4 mr-2" />,
+  [VehicleType.OTHER]: <CircleParking className="h-4 w-4 mr-2" />,
+};
 
 export default function MaintenanceAndParking({
   formData,
@@ -56,7 +64,7 @@ export default function MaintenanceAndParking({
 
     formData.parkingSlots?.forEach((parkingSlot, index) => {
       if (!parkingSlot.id) {
-        newErrors[index].parkingSpotId = "Please select a parking spot";
+        newErrors[index].id = "Please select a parking spot";
       }
 
       if (!parkingSlot.vehicleType) {
@@ -93,7 +101,8 @@ export default function MaintenanceAndParking({
     if (!data || !formData.building?.id) return;
 
     const filteredSlots = data.filter(
-      ({ buildingId }) => formData.building?.id === buildingId
+      ({ buildingId, status }) =>
+        formData.building?.id === buildingId && status !== RoomStatus.available
     );
 
     setAvailableParkingSlot(filteredSlots);
@@ -149,7 +158,7 @@ export default function MaintenanceAndParking({
   );
 }
 
-const ParkingSlotUnit = ({
+export const ParkingSlotUnit = ({
   parkingSlots,
   errors,
   handleInputChange,
@@ -179,7 +188,7 @@ const ParkingSlotUnit = ({
               htmlFor={VehicleType.CAR}
               className="cursor-pointer flex items-center"
             >
-              <Car className="h-4 w-4 mr-2" />
+              {VehicleIcons[VehicleType.CAR]}
               Car
             </Label>
           </div>
@@ -189,7 +198,7 @@ const ParkingSlotUnit = ({
               htmlFor={VehicleType.BIKE}
               className="cursor-pointer flex items-center"
             >
-              <Bike className="h-4 w-4 mr-2" />
+              {VehicleIcons[VehicleType.BIKE]}
               Bike
             </Label>
           </div>
@@ -199,9 +208,7 @@ const ParkingSlotUnit = ({
               htmlFor={VehicleType.EV}
               className="cursor-pointer flex items-center"
             >
-              <div className="flex">
-                <Car className="h-4 w-4 mr-1" />
-              </div>
+              {VehicleIcons[VehicleType.EV]}
               EV
             </Label>
           </div>
@@ -214,8 +221,18 @@ const ParkingSlotUnit = ({
               htmlFor={VehicleType.SCOOTER}
               className="cursor-pointer flex items-center"
             >
-              <Bike className="h-4 w-4 mr-2" />
+              {VehicleIcons[VehicleType.SCOOTER]}
               Scooter
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 bg-white/30 p-2 rounded-md border border-gray-200">
+            <RadioGroupItem value={VehicleType.OTHER} id={VehicleType.OTHER} />
+            <Label
+              htmlFor={VehicleType.OTHER}
+              className="cursor-pointer flex items-center"
+            >
+              {VehicleIcons[VehicleType.OTHER]}
+              Other
             </Label>
           </div>
         </RadioGroup>
@@ -233,7 +250,7 @@ const ParkingSlotUnit = ({
           <SelectTrigger
             id="id"
             className={`bg-white/50 border ${
-              errors.parkingSpotId ? "border-red-300" : "border-gray-200"
+              errors.id ? "border-red-300" : "border-gray-200"
             }`}
           >
             <SelectValue placeholder="Select a parking spot" />

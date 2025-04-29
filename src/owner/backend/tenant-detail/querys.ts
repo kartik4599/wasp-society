@@ -1,6 +1,7 @@
 import {
   type GetTenantProfileByUnitId,
   type GetTenantAgreementByUnitId,
+  type GetTenantParkingByUnitId,
 } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 import {
@@ -9,6 +10,7 @@ import {
   PersonalInformation,
   MemberInformation,
   Agreement,
+  ParkingSlot,
 } from "wasp/entities";
 
 export interface userProfile extends User {
@@ -26,6 +28,7 @@ interface getTenantProfileByUnitIdResponse {
     allocatedUserId: number | null;
     building: {
       name: string;
+      id: number;
     };
   };
   [key: string]: any;
@@ -46,7 +49,7 @@ export const getTenantProfileByUnitId: GetTenantProfileByUnitId<
     select: {
       allocatedUserId: true,
       id: true,
-      building: { select: { name: true } },
+      building: { select: { name: true, id: true } },
       name: true,
       floor: true,
     },
@@ -96,4 +99,21 @@ export const getTenantAgreementByUnitId: GetTenantAgreementByUnitId<
   if (!agreement) throw new HttpError(404, "Agreement not found");
 
   return agreement;
+};
+
+export const getTenantParkingByUnitId: GetTenantParkingByUnitId<
+  {
+    id: string;
+  },
+  ParkingSlot[]
+> = async ({ id }, ctx) => {
+  const user = ctx.user;
+  if (!user || !id)
+    throw new HttpError(401, "User not authenticated or ID not provided");
+
+  const { ParkingSlot } = ctx.entities;
+
+  const slots = await ParkingSlot.findMany({ where: { unitId: Number(id) } });
+
+  return slots;
 };
