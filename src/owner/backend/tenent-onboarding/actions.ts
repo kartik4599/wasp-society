@@ -1,12 +1,12 @@
 import { type CreateTenant } from "wasp/server/operations";
 import { TenantOnboardingData } from "../../frontend/tenent-onboarding/tenent-onboarding-page";
-import { Role, AgreementType, RoomStatus } from "@prisma/client";
+import { Role, AgreementType, RoomStatus, PaymentType } from "@prisma/client";
 
 export const createTenant: CreateTenant<TenantOnboardingData, void> = async (
   args,
   ctx
 ) => {
-  const { User, Agreement, Unit, ParkingSlot } = ctx.entities;
+  const { User, Agreement, Unit, ParkingSlot, Payment } = ctx.entities;
   const { tenant, building, unit, agreement, parkingSlots } = args;
 
   if (!tenant || !building || !unit || !agreement || !parkingSlots)
@@ -57,5 +57,44 @@ export const createTenant: CreateTenant<TenantOnboardingData, void> = async (
         }
       )
     ),
+    (async () => {
+      if (agreement?.monthlyRent) {
+        await Payment.create({
+          data: {
+            type: PaymentType.RENT,
+            amount: agreement?.monthlyRent,
+            dueDate: agreement.startDate || "",
+            tenantId: tenantUser.id,
+            unitId: tenantUnit.id,
+          },
+        });
+      }
+    })(),
+    (async () => {
+      if (agreement.depositAmount) {
+        await Payment.create({
+          data: {
+            type: PaymentType.DEPOSIT,
+            amount: agreement?.depositAmount,
+            dueDate: agreement.startDate || "",
+            tenantId: tenantUser.id,
+            unitId: tenantUnit.id,
+          },
+        });
+      }
+    })(),
+    (async () => {
+      if (agreement.maintenance) {
+        await Payment.create({
+          data: {
+            type: PaymentType.MAINTENANCE,
+            amount: agreement?.maintenance,
+            dueDate: agreement.startDate || "",
+            tenantId: tenantUser.id,
+            unitId: tenantUnit.id,
+          },
+        });
+      }
+    })(),
   ]);
 };

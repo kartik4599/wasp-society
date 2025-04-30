@@ -102,7 +102,7 @@ export default function MaintenanceAndParking({
 
     const filteredSlots = data.filter(
       ({ buildingId, status }) =>
-        formData.building?.id === buildingId && status !== RoomStatus.available
+        formData.building?.id === buildingId && status !== RoomStatus.occupied
     );
 
     setAvailableParkingSlot(filteredSlots);
@@ -310,7 +310,7 @@ export const ParkingSlotUnit = ({
           }`}
         />
         {errors.vehicleModel && (
-          <p className="text-sm text-red-500">{errors.vehicleNumber}</p>
+          <p className="text-sm text-red-500">{errors.vehicleModel}</p>
         )}
       </div>
     </div>

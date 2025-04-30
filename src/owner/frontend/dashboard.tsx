@@ -60,224 +60,235 @@ export const MOCK_DATA = {
 
 export function OwnerDashboard() {
   return (
-    <div className="space-y-6 w-full">
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Buildings"
-          value={MOCK_DATA.buildings.length}
-          icon={<Building2 className="h-5 w-5" />}
-          description="Total buildings"
-          color="blue"
-        />
-        <StatCard
-          title="Tenants"
-          value={MOCK_DATA.tenants.length}
-          icon={<Users className="h-5 w-5" />}
-          description="Active tenants"
-          color="green"
-        />
-        <StatCard
-          title="Visitors"
-          value={MOCK_DATA.visitors.length}
-          icon={<Calendar className="h-5 w-5" />}
-          description="Recent visitors"
-          color="purple"
-        />
-        <StatCard
-          title="Payments"
-          value={`₹${MOCK_DATA.payments
-            .reduce((sum, p) => sum + p.amount, 0)
-            .toLocaleString()}`}
-          icon={<CreditCard className="h-5 w-5" />}
-          description="Total collected"
-          color="amber"
-        />
+    <div className="w-full flex flex-col p-6">
+      <div className="flex flex-col">
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
       </div>
+      <div className="space-y-6 w-full">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Buildings"
+            value={MOCK_DATA.buildings.length}
+            icon={<Building2 className="h-5 w-5" />}
+            description="Total buildings"
+            color="blue"
+          />
+          <StatCard
+            title="Tenants"
+            value={MOCK_DATA.tenants.length}
+            icon={<Users className="h-5 w-5" />}
+            description="Active tenants"
+            color="green"
+          />
+          <StatCard
+            title="Visitors"
+            value={MOCK_DATA.visitors.length}
+            icon={<Calendar className="h-5 w-5" />}
+            description="Recent visitors"
+            color="purple"
+          />
+          <StatCard
+            title="Payments"
+            value={`₹${MOCK_DATA.payments
+              .reduce((sum, p) => sum + p.amount, 0)
+              .toLocaleString()}`}
+            icon={<CreditCard className="h-5 w-5" />}
+            description="Total collected"
+            color="amber"
+          />
+        </div>
 
-      {/* Buildings Section */}
-      <DashboardBuilding />
-      {/* Tenants Section */}
-      <DashboardTenantlist />
+        {/* Buildings Section */}
+        <DashboardBuilding />
+        {/* Tenants Section */}
+        <DashboardTenantlist />
 
-      {/* Visitors Section */}
-      <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle className="text-xl font-semibold">
-              Recent Visitors
-            </CardTitle>
-            <CardDescription>Track visitors to your property</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {MOCK_DATA.visitors.length === 0 ? (
-            <EmptyState
-              title="No visitors logged yet"
-              description="Visitor logs will appear here"
-              icon={<Calendar className="h-12 w-12" />}
-            />
-          ) : (
-            <div className="rounded-md border bg-white/50">
-              <div className="p-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-sm text-gray-500">
-                      <th className="pb-2">Name</th>
-                      <th className="pb-2">Date</th>
-                      <th className="pb-2">Unit</th>
-                      <th className="pb-2 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MOCK_DATA.visitors.map((visitor) => (
-                      <tr key={visitor.id} className="border-t border-gray-100">
-                        <td className="py-3">{visitor.name}</td>
-                        <td className="py-3">{visitor.date}</td>
-                        <td className="py-3">{visitor.unit}</td>
-                        <td className="py-3 text-right">
-                          <Button variant="ghost" size="sm">
-                            Details
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+        {/* Visitors Section */}
+        <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-xl font-semibold">
+                Recent Visitors
+              </CardTitle>
+              <CardDescription>Track visitors to your property</CardDescription>
             </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between border-t border-white/20 pt-4">
-          <Button variant="outline" size="sm" className="bg-white/50">
-            View All Visitors
-          </Button>
-        </CardFooter>
-      </Card>
-
-      {/* Payments Section */}
-      <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle className="text-xl font-semibold">
-              Recent Payments
-            </CardTitle>
-            <CardDescription>
-              Track rent and maintenance payments
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {MOCK_DATA.payments.length === 0 ? (
-            <EmptyState
-              title="No payments recorded yet"
-              description="Payment records will appear here"
-              icon={<CreditCard className="h-12 w-12" />}
-            />
-          ) : (
-            <div className="rounded-md border bg-white/50">
-              <div className="p-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-sm text-gray-500">
-                      <th className="pb-2">Tenant</th>
-                      <th className="pb-2">Amount</th>
-                      <th className="pb-2">Status</th>
-                      <th className="pb-2">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MOCK_DATA.payments.map((payment) => (
-                      <tr key={payment.id} className="border-t border-gray-100">
-                        <td className="py-3">{payment.tenant}</td>
-                        <td className="py-3">
-                          ₹{payment.amount.toLocaleString()}
-                        </td>
-                        <td className="py-3">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              payment.status === "Paid"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {payment.status}
-                          </span>
-                        </td>
-                        <td className="py-3">{payment.date}</td>
+          </CardHeader>
+          <CardContent>
+            {MOCK_DATA.visitors.length === 0 ? (
+              <EmptyState
+                title="No visitors logged yet"
+                description="Visitor logs will appear here"
+                icon={<Calendar className="h-12 w-12" />}
+              />
+            ) : (
+              <div className="rounded-md border bg-white/50">
+                <div className="p-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-sm text-gray-500">
+                        <th className="pb-2">Name</th>
+                        <th className="pb-2">Date</th>
+                        <th className="pb-2">Unit</th>
+                        <th className="pb-2 text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {MOCK_DATA.visitors.map((visitor) => (
+                        <tr
+                          key={visitor.id}
+                          className="border-t border-gray-100"
+                        >
+                          <td className="py-3">{visitor.name}</td>
+                          <td className="py-3">{visitor.date}</td>
+                          <td className="py-3">{visitor.unit}</td>
+                          <td className="py-3 text-right">
+                            <Button variant="ghost" size="sm">
+                              Details
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between border-t border-white/20 pt-4">
-          <Button variant="outline" size="sm" className="bg-white/50">
-            View All Payments
-          </Button>
-        </CardFooter>
-      </Card>
+            )}
+          </CardContent>
+          <CardFooter className="flex justify-between border-t border-white/20 pt-4">
+            <Button variant="outline" size="sm" className="bg-white/50">
+              View All Visitors
+            </Button>
+          </CardFooter>
+        </Card>
 
-      {/* Parking Section */}
-      <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle className="text-xl font-semibold">Parking</CardTitle>
-            <CardDescription>
-              Manage parking spots and assignments
-            </CardDescription>
-          </div>
-          <Button size="sm" className="bg-purple-500 hover:bg-purple-600">
-            <Plus className="h-4 w-4 mr-1" /> Add Parking Spot
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {MOCK_DATA.parking.length === 0 ? (
-            <EmptyState
-              title="No parking spots added yet"
-              description="Add parking spots to manage vehicle parking"
-              icon={<Car className="h-12 w-12" />}
-              actionLabel="Add Parking Spot"
-            />
-          ) : (
-            <div className="rounded-md border bg-white/50">
-              <div className="p-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-sm text-gray-500">
-                      <th className="pb-2">Spot</th>
-                      <th className="pb-2">Assigned To</th>
-                      <th className="pb-2">Vehicle</th>
-                      <th className="pb-2 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MOCK_DATA.parking.map((spot) => (
-                      <tr key={spot.id} className="border-t border-gray-100">
-                        <td className="py-3">{spot.spot}</td>
-                        <td className="py-3">{spot.assignedTo}</td>
-                        <td className="py-3">{spot.vehicle}</td>
-                        <td className="py-3 text-right">
-                          <Button variant="ghost" size="sm">
-                            Edit
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+        {/* Payments Section */}
+        <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-xl font-semibold">
+                Recent Payments
+              </CardTitle>
+              <CardDescription>
+                Track rent and maintenance payments
+              </CardDescription>
             </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between border-t border-white/20 pt-4">
-          <Button variant="outline" size="sm" className="bg-white/50">
-            View All Parking
-          </Button>
-        </CardFooter>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            {MOCK_DATA.payments.length === 0 ? (
+              <EmptyState
+                title="No payments recorded yet"
+                description="Payment records will appear here"
+                icon={<CreditCard className="h-12 w-12" />}
+              />
+            ) : (
+              <div className="rounded-md border bg-white/50">
+                <div className="p-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-sm text-gray-500">
+                        <th className="pb-2">Tenant</th>
+                        <th className="pb-2">Amount</th>
+                        <th className="pb-2">Status</th>
+                        <th className="pb-2">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {MOCK_DATA.payments.map((payment) => (
+                        <tr
+                          key={payment.id}
+                          className="border-t border-gray-100"
+                        >
+                          <td className="py-3">{payment.tenant}</td>
+                          <td className="py-3">
+                            ₹{payment.amount.toLocaleString()}
+                          </td>
+                          <td className="py-3">
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                payment.status === "Paid"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {payment.status}
+                            </span>
+                          </td>
+                          <td className="py-3">{payment.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="flex justify-between border-t border-white/20 pt-4">
+            <Button variant="outline" size="sm" className="bg-white/50">
+              View All Payments
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Parking Section */}
+        <Card className="backdrop-blur-md bg-white/30 border border-white/50 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-xl font-semibold">Parking</CardTitle>
+              <CardDescription>
+                Manage parking spots and assignments
+              </CardDescription>
+            </div>
+            <Button size="sm" className="bg-purple-500 hover:bg-purple-600">
+              <Plus className="h-4 w-4 mr-1" /> Add Parking Spot
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {MOCK_DATA.parking.length === 0 ? (
+              <EmptyState
+                title="No parking spots added yet"
+                description="Add parking spots to manage vehicle parking"
+                icon={<Car className="h-12 w-12" />}
+                actionLabel="Add Parking Spot"
+              />
+            ) : (
+              <div className="rounded-md border bg-white/50">
+                <div className="p-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-sm text-gray-500">
+                        <th className="pb-2">Spot</th>
+                        <th className="pb-2">Assigned To</th>
+                        <th className="pb-2">Vehicle</th>
+                        <th className="pb-2 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {MOCK_DATA.parking.map((spot) => (
+                        <tr key={spot.id} className="border-t border-gray-100">
+                          <td className="py-3">{spot.spot}</td>
+                          <td className="py-3">{spot.assignedTo}</td>
+                          <td className="py-3">{spot.vehicle}</td>
+                          <td className="py-3 text-right">
+                            <Button variant="ghost" size="sm">
+                              Edit
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="flex justify-between border-t border-white/20 pt-4">
+            <Button variant="outline" size="sm" className="bg-white/50">
+              View All Parking
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 }

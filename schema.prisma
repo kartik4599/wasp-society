@@ -49,6 +49,28 @@ enum VehicleType {
   OTHER
 }
 
+enum PaymentType {
+  RENT
+  MAINTENANCE
+  DEPOSIT
+  ADVANCE
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum PaymentMethod {
+  UPI
+  CASH
+  CARD
+  BANK_TRANSFER
+  OTHER
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String?
@@ -66,6 +88,7 @@ model User {
   AdditionalInformation AdditionalInformation?
   MemberInformation     MemberInformation[]
   ParkingSlot           ParkingSlot[]
+  Payment               Payment[]
 }
 
 model PersonalInformation {
@@ -145,6 +168,7 @@ model Unit {
   createdAt   DateTime      @default(now())
   Agreement   Agreement[]
   ParkingSlot ParkingSlot[]
+  Payment     Payment[]
 
   @@unique([name, buildingId])
 }
@@ -184,4 +208,24 @@ model ParkingSlot {
   unit         Unit?    @relation(fields: [unitId], references: [id])
   assignedToId Int?
   assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+}
+
+model Payment {
+  id          Int            @id @default(autoincrement())
+  type        PaymentType
+  amount      Float
+  status      PaymentStatus  @default(PENDING)
+  dueDate     DateTime
+  paidDate    DateTime?
+  method      PaymentMethod?
+  referenceId String?
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  tenantId Int
+  tenant   User @relation(fields: [tenantId], references: [id])
+  unitId   Int
+  unit     Unit @relation(fields: [unitId], references: [id])
 }

@@ -121,7 +121,7 @@ query getTenantList{
 
 action createTenant {
   fn: import { createTenant } from "@src/owner/backend/tenent-onboarding/actions",
-  entities: [User, Unit, Agreement, ParkingSlot]
+  entities: [User, Unit, Agreement, ParkingSlot, Payment]
 }
 
 route TenentManagementRoute { path: "/tenent-management", to: TenentManagement }
