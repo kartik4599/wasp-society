@@ -42,8 +42,16 @@ export function BuildingDetail() {
   if (isLoading || !buildings) return <Loading />;
 
   return (
-    <>
-      <div className="w-full space-y-10">
+    <div className="w-full flex flex-col gap-6 p-6">
+      <div className="flex flex-col">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Building and Unit Management
+        </h1>
+        <p className="text-muted-foreground">
+          Track, manage, and process all units in one place
+        </p>
+      </div>
+      <div className="space-y-10">
         {buildings.map((building) => {
           const unitCounts = {
             total: building.Unit.length,
@@ -200,6 +208,6 @@ export function BuildingDetail() {
         isNew={newUnit}
         refetch={refetch}
       />
-    </>
+    </div>
   );
 }

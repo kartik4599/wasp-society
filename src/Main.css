@@ -7,7 +7,6 @@
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
 }
-
 main {
   padding: 1rem 0;
   flex: 1;
@@ -156,8 +155,6 @@ li {
     @apply bg-background text-foreground;
   }
 } */
-
-
 
 @layer base {
   * {

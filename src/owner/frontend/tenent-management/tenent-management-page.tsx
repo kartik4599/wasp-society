@@ -30,7 +30,7 @@ export function TenentManagement() {
   };
 
   return (
-    <div className=" mx-auto max-w-6xl w-full">
+    <div className="mx-auto max-w-6xl w-full">
       <div className="flex items-center justify-between flex-col lg:flex-row gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">

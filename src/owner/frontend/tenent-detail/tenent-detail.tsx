@@ -251,13 +251,7 @@ export function TenantDetailPage() {
   const { userProfile, unitDetail } = data;
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 to-blue-100 p-4">
-      <div className="absolute inset-0 w-full h-full">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
-
+    <>
       <div className="container mx-auto max-w-6xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
@@ -353,6 +347,6 @@ export function TenantDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

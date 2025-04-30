@@ -156,11 +156,11 @@ query getTenantParkingByUnitId{
 
 route ParkingPageRoute { path: "/parking-detail", to: ParkingPage }
 page ParkingPage {
-  component: import { ParkingPage } from "@src/owner/frontend/parking/parking-page.tsx"
+  component: import { ParkingPage } from "@src/owner/frontend/parking/parking-page"
 }
 
 query getBuildingParkingDetail {
-  fn: import { getBuildingParkingDetail } from "@src/owner/backend/parking/querys.ts",
+  fn: import { getBuildingParkingDetail } from "@src/owner/backend/parking/querys",
   entities: [Building, Society]
 }
 
@@ -173,6 +173,11 @@ crud ParkingSlots {
     update: {},
     delete: {}
   },
+}
+
+route PaymentPageRoute { path: "/payment-detail", to: PaymentPage }
+page PaymentPage {
+  component: import { PaymentPage } from "@src/owner/frontend/payments/payment-page"
 }
 
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }

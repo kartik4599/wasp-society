@@ -46,7 +46,7 @@ export default function DashboardSidebar() {
         icon: Calendar,
       },
       {
-        route: routes.OwnerDashboardRoute.to,
+        route: routes.PaymentPageRoute.to,
         name: "Payments",
         icon: CreditCard,
       },
@@ -133,22 +133,6 @@ export default function DashboardSidebar() {
               </SidebarMenuItem>
             );
           })}
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/">
-                <Bell className="h-4 w-4" />
-                <span>Notifications</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="border-t border-white/20">
