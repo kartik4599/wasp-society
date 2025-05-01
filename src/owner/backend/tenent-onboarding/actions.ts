@@ -18,7 +18,10 @@ export const createTenant: CreateTenant<TenantOnboardingData, void> = async (
   const tenantUser = await User.findUnique({ where: { id: tenant?.id } });
   if (!tenantUser) throw new Error("Tenant not found.");
 
-  const tenantUnit = await Unit.findUnique({ where: { id: unit.id } });
+  const tenantUnit = await Unit.findUnique({
+    where: { id: unit.id },
+    include: { building: { include: { society: true } } },
+  });
   if (!tenantUnit) throw new Error("Unit not found.");
 
   await Promise.all([
@@ -66,6 +69,7 @@ export const createTenant: CreateTenant<TenantOnboardingData, void> = async (
             dueDate: agreement.startDate || "",
             tenantId: tenantUser.id,
             unitId: tenantUnit.id,
+            societyId: tenantUnit.building.society.id,
           },
         });
       }
@@ -79,6 +83,7 @@ export const createTenant: CreateTenant<TenantOnboardingData, void> = async (
             dueDate: agreement.startDate || "",
             tenantId: tenantUser.id,
             unitId: tenantUnit.id,
+            societyId: tenantUnit.building.society.id,
           },
         });
       }
@@ -92,6 +97,7 @@ export const createTenant: CreateTenant<TenantOnboardingData, void> = async (
             dueDate: agreement.startDate || "",
             tenantId: tenantUser.id,
             unitId: tenantUnit.id,
+            societyId: tenantUnit.building.society.id,
           },
         });
       }
