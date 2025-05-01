@@ -180,6 +180,11 @@ page PaymentPage {
   component: import { PaymentPage } from "@src/owner/frontend/payments/payment-page"
 }
 
+query getPaymentSummary {
+  fn: import { getPaymentSummary } from "@src/owner/backend/payments/querys",
+  entities: [Society, Payment]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,
