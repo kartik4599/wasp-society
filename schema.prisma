@@ -224,8 +224,10 @@ model Payment {
   updatedAt   DateTime       @updatedAt
 
   // Relations
-  tenantId Int
-  tenant   User @relation(fields: [tenantId], references: [id])
-  unitId   Int
-  unit     Unit @relation(fields: [unitId], references: [id])
+  societyId Int
+  society   Society @relation(fields: [societyId], references: [id])
+  tenantId  Int
+  tenant    User    @relation(fields: [tenantId], references: [id])
+  unitId    Int
+  unit      Unit    @relation(fields: [unitId], references: [id])
 }
