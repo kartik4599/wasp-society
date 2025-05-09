@@ -1,28 +1,29 @@
-import type React from "react";
-
 import { useState } from "react";
 import { Download, Mail, Plus, RefreshCw, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { PaymentsTable } from "./payments-table";
 import { PaymentsFilter } from "./payments-filter";
 import { AddPaymentDialog } from "./add-payment-dialog";
 import { PaymentsSummary } from "./payments-summary";
+import TenantPaginationActions from "../tenants/tenant-pagination-actions";
+import { getPaymentList, useQuery } from "wasp/client/operations";
+import { GetPaymentListArgs } from "../../owner/backend/payments/querys";
 
 export default function PaymentsManagement() {
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
-  const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [selectedPayments, setSelectedPayments] = useState<number[]>([]);
+  const [filters, setFilters] = useState<GetPaymentListArgs>({
+    page: 1,
+    limit: 10,
+    search: "",
+    sortBy: {},
+  });
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  const { data: payments } = useQuery(getPaymentList, filters);
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    setSelectedPayments([]);
+  const changeHandler = (value: Partial<GetPaymentListArgs>) => {
+    setFilters((prev) => ({ ...prev, ...value }));
   };
 
   const handleBulkAction = (action: string) => {
@@ -48,7 +49,7 @@ export default function PaymentsManagement() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6 w-full">
       <div className="flex flex-col">
         <h1 className="text-3xl font-bold tracking-tight">
           Payments Management
@@ -58,10 +59,8 @@ export default function PaymentsManagement() {
         </p>
       </div>
 
-      {/* Summary Cards */}
       <PaymentsSummary />
 
-      {/* Filters and Actions */}
       <div className="flex bg-white/50 shadow-xl p-5 rounded-lg items-center justify-between flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 items-center gap-2">
           <div className="relative flex-1">
@@ -69,11 +68,13 @@ export default function PaymentsManagement() {
             <Input
               placeholder="Search by tenant, unit or transaction ID..."
               className="pl-8"
-              value={searchQuery}
-              onChange={handleSearch}
+              value={filters.search}
+              onChange={({ target: { value } }) =>
+                changeHandler({ search: value })
+              }
             />
           </div>
-          <PaymentsFilter />
+          <PaymentsFilter setFilter={setFilters} filter={filters} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -100,66 +101,19 @@ export default function PaymentsManagement() {
         </div>
       </div>
 
-      {/* Tabs and Table */}
-      <Tabs
-        defaultValue="all"
-        value={activeTab}
-        onValueChange={handleTabChange}
-        className="w-full"
-      >
-        <TabsList>
-          <TabsTrigger value="all">All Payments</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="paid">Paid</TabsTrigger>
-          <TabsTrigger value="overdue">Overdue</TabsTrigger>
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="mt-4">
-          <PaymentsTable
-            filter="all"
-            searchQuery={searchQuery}
-            selectedPayments={selectedPayments}
-            setSelectedPayments={setSelectedPayments}
-          />
-        </TabsContent>
-
-        <TabsContent value="pending" className="mt-4">
-          <PaymentsTable
-            filter="pending"
-            searchQuery={searchQuery}
-            selectedPayments={selectedPayments}
-            setSelectedPayments={setSelectedPayments}
-          />
-        </TabsContent>
-
-        <TabsContent value="paid" className="mt-4">
-          <PaymentsTable
-            filter="paid"
-            searchQuery={searchQuery}
-            selectedPayments={selectedPayments}
-            setSelectedPayments={setSelectedPayments}
-          />
-        </TabsContent>
-
-        <TabsContent value="overdue" className="mt-4">
-          <PaymentsTable
-            filter="overdue"
-            searchQuery={searchQuery}
-            selectedPayments={selectedPayments}
-            setSelectedPayments={setSelectedPayments}
-          />
-        </TabsContent>
-
-        <TabsContent value="upcoming" className="mt-4">
-          <PaymentsTable
-            filter="upcoming"
-            searchQuery={searchQuery}
-            selectedPayments={selectedPayments}
-            setSelectedPayments={setSelectedPayments}
-          />
-        </TabsContent>
-      </Tabs>
+      <PaymentsTable
+        payments={payments || []}
+        selectedPayments={selectedPayments}
+        setSelectedPayments={setSelectedPayments}
+        sortConfig={filters.sortBy}
+        setSortConfig={(config) => changeHandler({ sortBy: config })}
+      />
+      <TenantPaginationActions
+        onFilterChange={changeHandler}
+        isLast={true}
+        page={filters.page}
+        limit={filters.limit}
+      />
 
       {/* Bulk Actions */}
       {selectedPayments.length > 0 && (

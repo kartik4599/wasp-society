@@ -9,23 +9,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { GetTenentDetailListArgs } from "../../owner/backend/tenent-management/querys";
 
 interface TenantPaginationActionsProps {
-  filters: GetTenentDetailListArgs;
-  onFilterChange: (filters: Partial<GetTenentDetailListArgs>) => void;
+  page?: number;
+  limit?: number;
+  onFilterChange: (
+    filters: Record<"page" | "limit", number | undefined>
+  ) => void;
   isLast: boolean;
 }
 
 const TenantPaginationActions = ({
-  filters,
+  limit,
+  page,
   onFilterChange,
   isLast,
 }: TenantPaginationActionsProps) => {
   return (
     <Card className="backdrop-blur-lg w-fit flex items-center gap-x-4 ml-auto bg-white/30 border border-white/50 shadow-xl rounded-2xl p-3">
       <Select
-        value={filters.limit?.toString()}
+        value={limit?.toString()}
         onValueChange={(value) =>
           onFilterChange({ limit: Number(value), page: 1 })
         }
@@ -47,7 +50,7 @@ const TenantPaginationActions = ({
         <Button
           className="rounded-r-none bg-white/30 text-black hover:bg-white/50"
           size={"icon"}
-          disabled={filters.page === 1}
+          disabled={page === 1}
         >
           <ChevronLeft />
         </Button>
@@ -55,7 +58,7 @@ const TenantPaginationActions = ({
           size={"icon"}
           className="rounded-none bg-white/30 text-black hover:bg-white/50"
         >
-          {filters.page}
+          {page}
         </Button>
         <Button
           size={"icon"}

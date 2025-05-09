@@ -62,9 +62,10 @@ export function TenentManagement() {
         <TenantTable tenantList={data?.tenantList || []} />
       </Card>
       <TenantPaginationActions
-        filters={filters}
         onFilterChange={handleFilterChange}
         isLast={data?.total === data?.tenantList.length}
+        page={filters.page}
+        limit={filters.limit}
       />
     </div>
   );

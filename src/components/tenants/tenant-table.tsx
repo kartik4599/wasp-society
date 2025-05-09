@@ -8,25 +8,8 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { Button } from "../../components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
 import { Badge } from "../../components/ui/badge";
-import {
-  Eye,
-  Edit,
-  Send,
-  Trash2,
-  MoreHorizontal,
-  ChevronUp,
-  ChevronDown,
-  Phone,
-  Mail,
-  EyeIcon,
-} from "lucide-react";
+import { ChevronUp, ChevronDown, Phone, Mail, EyeIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -72,20 +55,6 @@ export default function TenantTable({ tenantList }: TenantTableProps) {
 
     return 0;
   });
-
-  const handleEditTenant = (tenantId: number) => {
-    // router.push(`/dashboard/tenants/${tenantId}/edit`);
-  };
-
-  const handleSendReminder = (tenant: any) => {
-    // In a real app, this would send a reminder to the tenant
-    console.log("Sending reminder to tenant:", tenant.name);
-    alert(`Reminder sent to ${tenant.name}!`);
-  };
-
-  const handleDeleteTenant = (tenant: any) => {
-    setTenantToDelete(tenant);
-  };
 
   const confirmDeleteTenant = () => {
     if (!tenantToDelete) return;

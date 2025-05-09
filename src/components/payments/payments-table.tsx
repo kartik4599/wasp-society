@@ -21,223 +21,62 @@ import {
 } from "../ui/table";
 import { Badge } from "../ui/badge";
 import { ViewReceiptDialog } from "../payments/view-receipt-dialog";
+import { ExtendedPayment } from "../../owner/backend/payments/querys";
+import { PaymentStatus, Prisma } from "@prisma/client";
 
 // Define payment status types and their corresponding styles
 const paymentStatusStyles = {
-  paid: {
+  [PaymentStatus.PAID]: {
     variant: "outline" as const,
     className: "bg-green-50 text-green-700 border-green-200 hover:bg-green-100",
   },
-  pending: {
+  [PaymentStatus.PENDING]: {
     variant: "outline" as const,
     className:
       "bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100",
   },
-  overdue: {
+  [PaymentStatus.OVERDUE]: {
     variant: "outline" as const,
     className: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100",
   },
-  upcoming: {
-    variant: "outline" as const,
-    className: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100",
-  },
 };
 
-// Mock data for payments
-const mockPayments = [
-  {
-    id: "pay-001",
-    tenantName: "Rahul Sharma",
-    unitNumber: "A-101",
-    buildingName: "Sunrise Apartments",
-    paymentType: "Rent",
-    amount: 15000,
-    dueDate: new Date(2023, 3, 5),
-    status: "paid",
-    paidDate: new Date(2023, 3, 3),
-    method: "UPI",
-    transactionId: "UPI123456789",
-  },
-  {
-    id: "pay-002",
-    tenantName: "Priya Patel",
-    unitNumber: "B-205",
-    buildingName: "Green Valley Towers",
-    paymentType: "Maintenance",
-    amount: 2500,
-    dueDate: new Date(2023, 3, 10),
-    status: "paid",
-    paidDate: new Date(2023, 3, 8),
-    method: "Bank Transfer",
-    transactionId: "BT987654321",
-  },
-  {
-    id: "pay-003",
-    tenantName: "Amit Kumar",
-    unitNumber: "C-304",
-    buildingName: "Riverside Heights",
-    paymentType: "Rent",
-    amount: 18000,
-    dueDate: new Date(2023, 3, 5),
-    status: "pending",
-    paidDate: null,
-    method: null,
-    transactionId: null,
-  },
-  {
-    id: "pay-004",
-    tenantName: "Sneha Gupta",
-    unitNumber: "A-203",
-    buildingName: "Sunrise Apartments",
-    paymentType: "Deposit",
-    amount: 30000,
-    dueDate: new Date(2023, 2, 15),
-    status: "overdue",
-    paidDate: null,
-    method: null,
-    transactionId: null,
-  },
-  {
-    id: "pay-005",
-    tenantName: "Vikram Singh",
-    unitNumber: "B-102",
-    buildingName: "Green Valley Towers",
-    paymentType: "Rent",
-    amount: 12000,
-    dueDate: new Date(2023, 4, 5),
-    status: "upcoming",
-    paidDate: null,
-    method: null,
-    transactionId: null,
-  },
-  {
-    id: "pay-006",
-    tenantName: "Neha Reddy",
-    unitNumber: "C-201",
-    buildingName: "Riverside Heights",
-    paymentType: "Parking Fee",
-    amount: 1500,
-    dueDate: new Date(2023, 3, 10),
-    status: "pending",
-    paidDate: null,
-    method: null,
-    transactionId: null,
-  },
-  {
-    id: "pay-007",
-    tenantName: "Rajesh Khanna",
-    unitNumber: "A-302",
-    buildingName: "Sunrise Apartments",
-    paymentType: "Maintenance",
-    amount: 3000,
-    dueDate: new Date(2023, 3, 15),
-    status: "paid",
-    paidDate: new Date(2023, 3, 14),
-    method: "Cash",
-    transactionId: "CASH123",
-  },
-  {
-    id: "pay-008",
-    tenantName: "Ananya Desai",
-    unitNumber: "B-304",
-    buildingName: "Green Valley Towers",
-    paymentType: "Rent",
-    amount: 14000,
-    dueDate: new Date(2023, 2, 5),
-    status: "overdue",
-    paidDate: null,
-    method: null,
-    transactionId: null,
-  },
-];
-
 interface PaymentsTableProps {
-  filter: "all" | "pending" | "paid" | "overdue" | "upcoming";
-  searchQuery: string;
-  selectedPayments: string[];
-  setSelectedPayments: (ids: string[]) => void;
+  payments: ExtendedPayment[];
+  selectedPayments: number[];
+  setSelectedPayments: (ids: number[]) => void;
+  setSortConfig: (config: Prisma.PaymentOrderByWithRelationInput) => void;
+  sortConfig: Prisma.PaymentOrderByWithRelationInput;
 }
 
 export function PaymentsTable({
-  filter,
-  searchQuery,
+  payments,
   selectedPayments,
   setSelectedPayments,
+  setSortConfig,
+  sortConfig,
 }: PaymentsTableProps) {
   const [viewReceiptOpen, setViewReceiptOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
-  const [sortConfig, setSortConfig] = useState<{
-    key: string;
-    direction: "asc" | "desc";
-  }>({
-    key: "dueDate",
-    direction: "asc",
-  });
 
-  // Filter payments based on filter type and search query
-  const filteredPayments = mockPayments
-    .filter((payment) => {
-      // Filter by status
-      if (filter !== "all" && payment.status !== filter) {
-        return false;
-      }
-
-      // Filter by search query
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          payment.tenantName.toLowerCase().includes(query) ||
-          payment.unitNumber.toLowerCase().includes(query) ||
-          (payment.transactionId &&
-            payment.transactionId.toLowerCase().includes(query))
-        );
-      }
-
-      return true;
-    })
-    .sort((a, b) => {
-      // Sort based on current sort config
-      const key = sortConfig.key as keyof typeof a;
-
-      if (key === "amount") {
-        return sortConfig.direction === "asc"
-          ? a[key] - b[key]
-          : b[key] - a[key];
-      }
-
-      if (key === "dueDate" || key === "paidDate") {
-        const dateA = a[key] ? new Date(a[key]).getTime() : 0;
-        const dateB = b[key] ? new Date(b[key]).getTime() : 0;
-        return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
-      }
-
-      // String comparison for other fields
-      const valueA = String(a[key]).toLowerCase();
-      const valueB = String(b[key]).toLowerCase();
-      return sortConfig.direction === "asc"
-        ? valueA.localeCompare(valueB)
-        : valueB.localeCompare(valueA);
-    });
-
-  const handleSort = (key: string) => {
+  const handleSort = (field: keyof Prisma.PaymentOrderByWithRelationInput) => {
     setSortConfig({
-      key,
-      direction:
-        sortConfig.key === key && sortConfig.direction === "asc"
+      [field]:
+        Object.keys(sortConfig).includes(field) && sortConfig[field] === "asc"
           ? "desc"
           : "asc",
     });
   };
 
   const handleSelectAll = () => {
-    if (selectedPayments.length === filteredPayments.length) {
+    if (selectedPayments.length === payments.length) {
       setSelectedPayments([]);
     } else {
-      setSelectedPayments(filteredPayments.map((payment) => payment.id));
+      setSelectedPayments(payments.map((payment) => payment.id));
     }
   };
 
-  const handleSelectPayment = (id: string) => {
+  const handleSelectPayment = (id: number) => {
     if (selectedPayments.includes(id)) {
       setSelectedPayments(
         selectedPayments.filter((paymentId) => paymentId !== id)
@@ -252,12 +91,12 @@ export function PaymentsTable({
     setViewReceiptOpen(true);
   };
 
-  const handleMarkAsPaid = (id: string) => {
+  const handleMarkAsPaid = (id: number) => {
     console.log("Mark as paid:", id);
     // Implementation would update payment status
   };
 
-  const handleSendReminder = (id: string) => {
+  const handleSendReminder = (id: number) => {
     console.log("Send reminder:", id);
     // Implementation would send a reminder
   };
@@ -270,35 +109,19 @@ export function PaymentsTable({
             <TableHead className="w-[50px]">
               <Checkbox
                 checked={
-                  filteredPayments.length > 0 &&
-                  selectedPayments.length === filteredPayments.length
+                  payments.length > 0 &&
+                  selectedPayments.length === payments.length
                 }
                 onCheckedChange={handleSelectAll}
                 aria-label="Select all"
               />
             </TableHead>
+            <TableHead>Tenant</TableHead>
+            <TableHead>Unit</TableHead>
             <TableHead>
               <div
                 className="flex cursor-pointer items-center"
-                onClick={() => handleSort("tenantName")}
-              >
-                Tenant
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div
-                className="flex cursor-pointer items-center"
-                onClick={() => handleSort("unitNumber")}
-              >
-                Unit
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div
-                className="flex cursor-pointer items-center"
-                onClick={() => handleSort("paymentType")}
+                onClick={() => handleSort("type")}
               >
                 Type
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -345,14 +168,14 @@ export function PaymentsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredPayments.length === 0 ? (
+          {payments.length === 0 ? (
             <TableRow>
               <TableCell colSpan={10} className="h-24 text-center">
                 No payments found.
               </TableCell>
             </TableRow>
           ) : (
-            filteredPayments.map((payment) => (
+            payments.map((payment) => (
               <TableRow key={payment.id}>
                 <TableCell>
                   <Checkbox
@@ -362,17 +185,21 @@ export function PaymentsTable({
                   />
                 </TableCell>
                 <TableCell className="font-medium">
-                  {payment.tenantName}
+                  {payment.tenant.name}
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span>{payment.unitNumber}</span>
+                    <span>{payment.unit.name}</span>
                     <span className="text-xs text-muted-foreground">
-                      {payment.buildingName}
+                      {payment.unit.building.name}
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>{payment.paymentType}</TableCell>
+                <TableCell>
+                  <Badge className="text-xs" variant="outline">
+                    {payment.type}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-right">
                   ₹{payment.amount.toLocaleString()}
                 </TableCell>
@@ -382,12 +209,12 @@ export function PaymentsTable({
                     variant={
                       paymentStatusStyles[
                         payment.status as keyof typeof paymentStatusStyles
-                      ].variant
+                      ]?.variant
                     }
                     className={
                       paymentStatusStyles[
                         payment.status as keyof typeof paymentStatusStyles
-                      ].className
+                      ]?.className
                     }
                   >
                     {payment.status.toUpperCase()}
@@ -409,7 +236,7 @@ export function PaymentsTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      {payment.status === "paid" && (
+                      {payment.status === PaymentStatus.PAID && (
                         <DropdownMenuItem
                           onClick={() => handleViewReceipt(payment)}
                         >
@@ -417,9 +244,8 @@ export function PaymentsTable({
                           View Receipt
                         </DropdownMenuItem>
                       )}
-                      {(payment.status === "pending" ||
-                        payment.status === "overdue" ||
-                        payment.status === "upcoming") && (
+                      {(payment.status === PaymentStatus.PENDING ||
+                        payment.status === PaymentStatus.OVERDUE) && (
                         <DropdownMenuItem
                           onClick={() => handleMarkAsPaid(payment.id)}
                         >
@@ -427,8 +253,8 @@ export function PaymentsTable({
                           Mark as Paid
                         </DropdownMenuItem>
                       )}
-                      {(payment.status === "pending" ||
-                        payment.status === "overdue") && (
+                      {(payment.status === PaymentStatus.PENDING ||
+                        payment.status === PaymentStatus.OVERDUE) && (
                         <DropdownMenuItem
                           onClick={() => handleSendReminder(payment.id)}
                         >
