@@ -9,6 +9,7 @@ import { PaymentsSummary } from "./payments-summary";
 import TenantPaginationActions from "../tenants/tenant-pagination-actions";
 import { getPaymentList, useQuery } from "wasp/client/operations";
 import { GetPaymentListArgs } from "../../owner/backend/payments/querys";
+import { makePaymentPaid } from "wasp/client/operations";
 
 export default function PaymentsManagement() {
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
@@ -20,21 +21,23 @@ export default function PaymentsManagement() {
     sortBy: {},
   });
 
-  const { data: payments } = useQuery(getPaymentList, filters);
+  const { data: payments, refetch } = useQuery(getPaymentList, filters);
 
   const changeHandler = (value: Partial<GetPaymentListArgs>) => {
     setFilters((prev) => ({ ...prev, ...value }));
   };
 
-  const handleBulkAction = (action: string) => {
+  const handleBulkAction = async (action: string) => {
     if (selectedPayments.length === 0) return;
 
     // Handle different bulk actions
     switch (action) {
-      case "mark-paid":
-        console.log("Mark as paid:", selectedPayments);
-        // Implementation would update payment status
+      case "mark-paid": {
+        await makePaymentPaid({ paymentIds: selectedPayments });
+        refetch();
+        setSelectedPayments([]);
         break;
+      }
       case "send-reminder":
         console.log("Send reminder:", selectedPayments);
         // Implementation would send reminders
@@ -107,6 +110,7 @@ export default function PaymentsManagement() {
         setSelectedPayments={setSelectedPayments}
         sortConfig={filters.sortBy}
         setSortConfig={(config) => changeHandler({ sortBy: config })}
+        refetch={refetch}
       />
       <TenantPaginationActions
         onFilterChange={changeHandler}

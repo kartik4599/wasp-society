@@ -185,6 +185,11 @@ query getPaymentSummary {
   entities: [Society, Payment]
 }
 
+action makePaymentPaid {
+  fn: import { makePaymentPaid } from "@src/owner/backend/payments/actions",
+  entities: [Society, Payment]
+}
+
 query getPaymentList {
   fn: import { getPaymentList } from "@src/owner/backend/payments/querys",
   entities: [Society, Payment]

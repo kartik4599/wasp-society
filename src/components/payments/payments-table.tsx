@@ -23,6 +23,7 @@ import { Badge } from "../ui/badge";
 import { ViewReceiptDialog } from "../payments/view-receipt-dialog";
 import { ExtendedPayment } from "../../owner/backend/payments/querys";
 import { PaymentStatus, Prisma } from "@prisma/client";
+import { makePaymentPaid } from "wasp/client/operations";
 
 // Define payment status types and their corresponding styles
 const paymentStatusStyles = {
@@ -47,6 +48,7 @@ interface PaymentsTableProps {
   setSelectedPayments: (ids: number[]) => void;
   setSortConfig: (config: Prisma.PaymentOrderByWithRelationInput) => void;
   sortConfig: Prisma.PaymentOrderByWithRelationInput;
+  refetch: () => void;
 }
 
 export function PaymentsTable({
@@ -55,6 +57,7 @@ export function PaymentsTable({
   setSelectedPayments,
   setSortConfig,
   sortConfig,
+  refetch,
 }: PaymentsTableProps) {
   const [viewReceiptOpen, setViewReceiptOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
@@ -91,8 +94,10 @@ export function PaymentsTable({
     setViewReceiptOpen(true);
   };
 
-  const handleMarkAsPaid = (id: number) => {
+  const handleMarkAsPaid = async (id: number) => {
     console.log("Mark as paid:", id);
+    await makePaymentPaid({ paymentIds: [id] });
+    refetch();
     // Implementation would update payment status
   };
 
@@ -262,8 +267,6 @@ export function PaymentsTable({
                           Send Reminder
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>Edit Details</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
