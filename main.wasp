@@ -200,6 +200,11 @@ query getUnitPaymentSummary {
   entities: [Society, Payment, Agreement, Unit]
 }
 
+action createPayment {
+  fn: import { createPayment } from "@src/owner/backend/payments/actions",
+  entities: [Society, Payment, Unit]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,
