@@ -304,7 +304,7 @@ export function TenantDetailPage() {
             </TabsContent>
 
             <TabsContent value="payments">
-              <TenantPayments tenant={tenant} />
+              <TenantPayments />
             </TabsContent>
 
             <TabsContent value="parking">
@@ -326,7 +326,7 @@ export function TenantDetailPage() {
       </div>
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="backdrop-blur-lg bg-white/70 border border-white/50">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Tenant Removal</DialogTitle>
             <DialogDescription>
