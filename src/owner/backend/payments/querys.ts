@@ -1,9 +1,16 @@
 import {
   type GetPaymentSummary,
   type GetPaymentList,
+  type GetUnitPaymentSummary,
 } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
-import { lastDayOfMonth, startOfMonth, startOfWeek, endOfWeek } from "date-fns";
+import {
+  lastDayOfMonth,
+  startOfMonth,
+  startOfWeek,
+  endOfWeek,
+  format,
+} from "date-fns";
 import { PaymentStatus, PaymentType, Prisma } from "@prisma/client";
 import { Payment, Unit, User, Building } from "wasp/entities";
 
@@ -25,14 +32,24 @@ interface PaymentSummary {
 }
 
 export interface GetPaymentListArgs {
+  page: number;
+  limit: number;
+  sortBy: Prisma.PaymentOrderByWithRelationInput;
   search?: string;
   buildingId?: number;
   type?: PaymentType;
   status?: PaymentStatus;
   dateRange?: { start: Date; end: Date };
-  page: number;
-  limit: number;
-  sortBy: Prisma.PaymentOrderByWithRelationInput;
+  unitId?: number;
+  tenantId?: number;
+  [key: string]: any;
+}
+
+interface UnitPaymentSummary {
+  monthRent: number | null;
+  pendingAmount: number;
+  paidAmount: number;
+  rentDate: string | null;
   [key: string]: any;
 }
 
@@ -180,6 +197,8 @@ export const getPaymentList: GetPaymentList<
       lte: args.dateRange.end,
     };
   }
+  if (args.unitId) filters.unitId = args.unitId;
+  if (args.tenantId) filters.tenantId = args.tenantId;
 
   const payments = await Payment.findMany({
     where: { societyId: society.id, ...filters },
@@ -190,4 +209,80 @@ export const getPaymentList: GetPaymentList<
   });
 
   return payments;
+};
+
+export const getUnitPaymentSummary: GetUnitPaymentSummary<
+  {
+    unitId: number;
+  },
+  UnitPaymentSummary
+> = async (args, ctx) => {
+  const user = ctx.user;
+  if (!user) throw new HttpError(401, "Unauthorized");
+
+  const { Society, Payment, Agreement, Unit } = ctx.entities;
+
+  const society = await Society.findUnique({ where: { createdById: user.id } });
+  if (!society) throw new HttpError(401, "Unauthorized");
+
+  const unit = await Unit.findUnique({ where: { id: args.unitId } });
+  if (!unit || !unit.allocatedUserId)
+    throw new HttpError(401, "Unit Not found");
+
+  const agreement = await Agreement.findFirst({
+    where: {
+      unitId: unit.id,
+      tenantId: unit.allocatedUserId,
+    },
+  });
+
+  const [pending, paid] = await Promise.all([
+    await Payment.groupBy({
+      by: ["tenantId"],
+      where: {
+        tenantId: unit.allocatedUserId,
+        unitId: unit.id,
+        OR: [
+          { status: PaymentStatus.PENDING },
+          { status: PaymentStatus.OVERDUE },
+        ],
+      },
+      _sum: { amount: true },
+    }),
+    await Payment.groupBy({
+      by: ["tenantId"],
+      where: {
+        tenantId: unit.allocatedUserId,
+        unitId: unit.id,
+        status: PaymentStatus.PAID,
+      },
+      _sum: { amount: true },
+    }),
+  ]);
+
+  const paymentSummary = {
+    monthRent:
+      agreement?.agreementType === "rent" ? agreement.monthlyRent : null,
+    rentDate:
+      agreement?.agreementType === "rent"
+        ? format(agreement?.startDate, "do")
+        : null,
+    pendingAmount: 0,
+    paidAmount: 0,
+  };
+
+  await Promise.all([
+    (async () => {
+      pending.forEach((payment) => {
+        paymentSummary.pendingAmount += payment._sum.amount || 0;
+      });
+    })(),
+    (async () => {
+      paid.forEach((payment) => {
+        paymentSummary.paidAmount += payment._sum.amount || 0;
+      });
+    })(),
+  ]);
+
+  return paymentSummary;
 };

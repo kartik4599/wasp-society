@@ -195,6 +195,11 @@ query getPaymentList {
   entities: [Society, Payment]
 }
 
+query getUnitPaymentSummary {
+  fn: import { getUnitPaymentSummary } from "@src/owner/backend/payments/querys",
+  entities: [Society, Payment, Agreement, Unit]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,
