@@ -1,6 +1,5 @@
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import {
@@ -33,24 +32,38 @@ import { cn } from "../../lib/utils";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getTenentDetailList, useQuery } from "wasp/client/operations";
+import { PaymentType, PaymentMethod } from "@prisma/client";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { createPayment } from "wasp/client/operations";
 
 // Define form schema
-const formSchema = z.object({
+export const formSchema = z.object({
   tenantId: z.string({
     required_error: "Please select a tenant",
   }),
-  paymentType: z.string({
-    required_error: "Please select a payment type",
-  }),
+  paymentType: z.enum([
+    PaymentType.RENT,
+    PaymentType.MAINTENANCE,
+    PaymentType.DEPOSIT,
+    PaymentType.OTHER,
+  ]),
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Amount must be a positive number",
   }),
   paymentDate: z.date({
     required_error: "Please select a payment date",
   }),
-  paymentMethod: z.string({
-    required_error: "Please select a payment method",
-  }),
+  isPaid: z.boolean(),
+  paymentMethod: z
+    .enum([
+      PaymentMethod.CASH,
+      PaymentMethod.UPI,
+      PaymentMethod.CARD,
+      PaymentMethod.BANK_TRANSFER,
+      PaymentMethod.OTHER,
+    ])
+    .optional(),
   transactionId: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -64,39 +77,10 @@ export function AddPaymentDialog({
   open,
   onOpenChange,
 }: AddPaymentDialogProps) {
-  // Mock data for tenants
-  const tenants = [
-    {
-      id: "tenant-1",
-      name: "Rahul Sharma",
-      unit: "A-101",
-      building: "Sunrise Apartments",
-    },
-    {
-      id: "tenant-2",
-      name: "Priya Patel",
-      unit: "B-205",
-      building: "Green Valley Towers",
-    },
-    {
-      id: "tenant-3",
-      name: "Amit Kumar",
-      unit: "C-304",
-      building: "Riverside Heights",
-    },
-    {
-      id: "tenant-4",
-      name: "Sneha Gupta",
-      unit: "A-203",
-      building: "Sunrise Apartments",
-    },
-    {
-      id: "tenant-5",
-      name: "Vikram Singh",
-      unit: "B-102",
-      building: "Green Valley Towers",
-    },
-  ];
+  const { data: tenants } = useQuery(getTenentDetailList, {
+    limit: 5,
+    page: 1,
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -104,12 +88,15 @@ export function AddPaymentDialog({
       amount: "",
       transactionId: "",
       notes: "",
+      isPaid: false,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const isPaid = form.watch("isPaid");
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("Form values:", values);
-    // Implementation would save the payment
+    await createPayment(values);
     onOpenChange(false);
     form.reset();
   };
@@ -137,17 +124,22 @@ export function AddPaymentDialog({
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white">
                         <SelectValue placeholder="Select tenant" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {tenants.map((tenant) => (
-                        <SelectItem key={tenant.id} value={tenant.id}>
+                      {tenants?.tenantList.map((tenant) => (
+                        <SelectItem
+                          key={tenant.id}
+                          value={tenant.id.toString()}
+                        >
                           <div className="flex flex-col">
-                            <span>{tenant.name}</span>
+                            <span className="text-sm font-medium">
+                              {tenant.tenantName}
+                            </span>
                             <span className="text-xs text-muted-foreground">
-                              {tenant.unit}, {tenant.building}
+                              {tenant.unitNo}, {tenant.buildingName}
                             </span>
                           </div>
                         </SelectItem>
@@ -171,16 +163,14 @@ export function AddPaymentDialog({
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="rent">Rent</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
-                        <SelectItem value="deposit">Deposit</SelectItem>
-                        <SelectItem value="parking">Parking Fee</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        {Object.values(PaymentType).map((type) => (
+                          <SelectItem value={type}>{type}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -195,7 +185,11 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Amount (₹)</FormLabel>
                     <FormControl>
-                      <Input placeholder="0.00" {...field} />
+                      <Input
+                        placeholder="0.00"
+                        {...field}
+                        className="bg-white"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -203,75 +197,104 @@ export function AddPaymentDialog({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="paymentDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Payment Due Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-[1000]">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-2 gap-4 items-center">
               <FormField
                 control={form.control}
-                name="paymentDate"
+                name="isPaid"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Payment Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                  <FormItem className="space-y-3">
+                    <FormLabel>Is Payment Paid</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={(value) => {
+                          field.onChange(!!value);
+                        }}
+                        defaultValue={field.value ? "1" : ""}
+                        className="flex items-center gap-x-4"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="1" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Yes</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="" />
+                          </FormControl>
+                          <FormLabel className="font-normal">No</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="paymentMethod"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Payment Method</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select method" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="upi">UPI</SelectItem>
-                        <SelectItem value="bank-transfer">
-                          Bank Transfer
-                        </SelectItem>
-                        <SelectItem value="cheque">Cheque</SelectItem>
-                        <SelectItem value="card">Card</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {isPaid && (
+                <FormField
+                  control={form.control}
+                  name="paymentMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Payment Method</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-white">
+                            <SelectValue placeholder="Select method" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(PaymentMethod).map((value) => (
+                            <SelectItem value={value}>{value}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <FormField
@@ -281,7 +304,11 @@ export function AddPaymentDialog({
                 <FormItem>
                   <FormLabel>Transaction ID (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter transaction ID" {...field} />
+                    <Input
+                      placeholder="Enter transaction ID"
+                      {...field}
+                      className="bg-white"
+                    />
                   </FormControl>
                   <FormDescription>
                     Reference number for digital payments
@@ -298,7 +325,11 @@ export function AddPaymentDialog({
                 <FormItem>
                   <FormLabel>Notes (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Add any additional notes" {...field} />
+                    <Input
+                      placeholder="Add any additional notes"
+                      {...field}
+                      className="bg-white"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
