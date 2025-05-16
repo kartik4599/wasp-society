@@ -91,7 +91,9 @@ model User {
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
 
-  Society               Society?
+  workingSocietyId      Int?
+  workingSociety        Society?               @relation(fields: [workingSocietyId], references: [id], name: "staff")
+  Society               Society?               @relation(name: "creator")
   Unit                  Unit[]
   Agreement             Agreement[]
   PersonalInformation   PersonalInformation?
@@ -140,16 +142,17 @@ model MemberInformation {
 }
 
 model Society {
-  id          Int    @id @default(autoincrement())
-  name        String
-  address     String
-  type        String
-  createdById Int    @unique
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  id      Int    @id @default(autoincrement())
+  name    String
+  address String
+  type    String
 
-  Buildings Building[]
-  Payment   Payment[]
-  Visitor   Visitor[]
+  createdById Int        @unique
+  createdBy   User       @relation(fields: [createdById], references: [id], name: "creator")
+  Buildings   Building[]
+  Payment     Payment[]
+  Visitor     Visitor[]
+  staff       User[]     @relation(name: "staff")
 
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())

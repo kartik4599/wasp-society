@@ -205,14 +205,19 @@ action createPayment {
   entities: [Society, Payment, Unit]
 }
 
-route VisitorRoute { path: "/path", to: VisitorPage }
+route VisitorRoute { path: "/visitors-management", to: VisitorPage }
 page VisitorPage {
-  component: import { VisitorsManagement } from "@src/owner/frontend/visitors/visitors-management.tsx"
+  component: import { VisitorsManagement } from "@src/owner/frontend/visitors/visitors-management"
+}
+
+route StaffHomeRoute { path: "/staff-home", to: StaffHome }
+page StaffHome {
+  component: import StaffHome from "@src/staff/home/staff-home"
 }
 
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,
-  component: import { TenantDashboard } from "@src/tenant/frontend/dashboard.tsx"
+  component: import { TenantDashboard } from "@src/tenant/frontend/dashboard"
 }
 
