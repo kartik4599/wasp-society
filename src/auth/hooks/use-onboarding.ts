@@ -22,7 +22,7 @@ const userRoutes: Record<Role, string[]> = {
     routes.VisitorRoute.to.split("/")[1],
   ],
   [Role.tenant]: [routes.TenantDashboardRoute.to.split("/")[1]],
-  [Role.staff]: [],
+  [Role.staff]: [routes.StaffHomeRoute.to.split("/")[1]],
 };
 
 const commonRoutes: string[] = [
@@ -50,6 +50,7 @@ const useOnboarding = () => {
       return navigate(routes.OnboardingRoute.to);
     if (role === Role.owner && !society)
       return navigate(routes.OnboardingRoute.to);
+    if (role === Role.staff && !society) return navigate(routes.RootRoute.to);
     if (
       role === Role.tenant &&
       (!personalDetail?.additionalInformation ||
@@ -76,6 +77,7 @@ const useOnboarding = () => {
       return navigate(routes.OwnerDashboardRoute.to);
     if (user.role === Role.tenant)
       return navigate(routes.TenantDashboardRoute.to);
+    if (user.role === Role.staff) return navigate(routes.StaffHomeRoute.to);
   }, [pathname, user]);
 
   // redirecting user if is on wrong route
