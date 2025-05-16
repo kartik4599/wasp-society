@@ -41,7 +41,7 @@ export default function DashboardSidebar() {
       { route: routes.TenentManagementRoute.to, name: "Tenants", icon: Users },
       { route: routes.ParkingPageRoute.to, name: "Parking", icon: Car },
       {
-        route: routes.OwnerDashboardRoute.to,
+        route: routes.VisitorRoute.to,
         name: "Visitors",
         icon: Calendar,
       },
