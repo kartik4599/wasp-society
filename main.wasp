@@ -220,6 +220,11 @@ action createVisitor {
   entities: [Visitor]
 }
 
+query getStaffSummary {
+  fn: import { getStaffSummary } from "@src/staff/backend/querys",
+  entities: [Visitor]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,
