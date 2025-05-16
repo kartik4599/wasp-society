@@ -28,6 +28,8 @@ import {
   FormMessage,
 } from "../../../components/ui/form";
 import { VisitorType } from "@prisma/client";
+import { Units } from "wasp/client/crud";
+import { createVisitor } from "wasp/client/operations";
 
 const visitorFormSchema = z.object({
   name: z.string().min(1, { message: "Visitor Name is required." }),
@@ -44,13 +46,13 @@ const visitorFormSchema = z.object({
     VisitorType.OTHER,
     VisitorType.VENDOR,
   ]),
-  unit: z.string().min(1, { message: "Visiting Unit is required." }),
+  unit: z.number().min(1, { message: "Visiting Unit is required." }),
   purpose: z.string().min(1, { message: "Purpose of Visit is required." }),
   notes: z.string().optional(),
   photo: z.any().optional(), // If you were to handle file uploads
 });
 
-type VisitorFormData = z.infer<typeof visitorFormSchema>;
+export type VisitorFormData = z.infer<typeof visitorFormSchema>;
 
 interface AddVisitorDialogProps {
   open: boolean;
@@ -58,16 +60,17 @@ interface AddVisitorDialogProps {
 }
 
 export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
+  const units = Units.getAll.useQuery();
+
   const form = useForm<VisitorFormData>({
     resolver: zodResolver(visitorFormSchema),
   });
 
   const onSubmit = (data: VisitorFormData) => {
     console.log("Adding visitor:", data);
-    // In a real app, this would call onAddVisitor(data) or similar
-    // to add the visitor to the database
-    // form.reset(); // Reset form after submission
-    // onClose();
+    createVisitor(data);
+    form.reset(); // Reset form after submission
+    onClose();
   };
 
   return (
@@ -110,7 +113,7 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                     <FormItem className="space-y-2">
                       <FormLabel htmlFor="name">Visitor Name *</FormLabel>
                       <FormControl>
-                        <Input id="name" {...field} className="bg-red-400" />
+                        <Input id="name" {...field} className="bg-white/70" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -124,7 +127,7 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                     <FormItem className="space-y-2">
                       <FormLabel htmlFor="phone">Phone Number *</FormLabel>
                       <FormControl>
-                        <Input id="phone" {...field} />
+                        <Input id="phone" {...field} className="bg-white/70" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -143,17 +146,16 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger id="type">
+                          <SelectTrigger id="type" className="bg-white/70">
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="family">Family</SelectItem>
-                          <SelectItem value="friend">Friend</SelectItem>
-                          <SelectItem value="delivery">Delivery</SelectItem>
-                          <SelectItem value="vendor">Vendor/Service</SelectItem>
-                          <SelectItem value="maid">Maid/Helper</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          {Object.values(VisitorType).map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -168,21 +170,26 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                     <FormItem className="space-y-2">
                       <FormLabel htmlFor="unit">Visiting Unit *</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
+                        onValueChange={(value) => field.onChange(Number(value))}
+                        defaultValue={field.value?.toString()}
+                        value={field.value?.toString()}
                       >
                         <FormControl>
-                          <SelectTrigger id="unit">
+                          <SelectTrigger id="unit" className="bg-white/70">
                             <SelectValue placeholder="Select unit" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="A-101">A-101</SelectItem>
-                          <SelectItem value="A-102">A-102</SelectItem>
-                          <SelectItem value="B-201">B-201</SelectItem>
-                          <SelectItem value="B-202">B-202</SelectItem>
-                          <SelectItem value="C-301">C-301</SelectItem>
+                          {units.data
+                            ?.filter((unit) => unit.status === "occupied")
+                            ?.map((unit) => (
+                              <SelectItem
+                                value={unit.id.toString()}
+                                key={unit.id}
+                              >
+                                {unit.name}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -204,7 +211,7 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger id="purpose">
+                          <SelectTrigger id="purpose" className="bg-white/70">
                             <SelectValue placeholder="Select purpose" />
                           </SelectTrigger>
                         </FormControl>
@@ -233,7 +240,7 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                         <Textarea
                           id="notes"
                           placeholder="Any additional information..."
-                          className="resize-none"
+                          className="resize-none bg-white/70"
                           {...field}
                         />
                       </FormControl>
