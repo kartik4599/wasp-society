@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../../components/ui/card";
 import { routes } from "wasp/client/router";
-import BuildingTypeSelection from "../../../components/buildings/building-type-selection";
-import MultipleBuildingsCreation from "../../../components/buildings/multiple-buildings-creation";
-import UnitsCreation from "../../../components/buildings/units-creation";
-import BuildingConfirmation from "../../../components/buildings/building-confirmation";
+import BuildingTypeSelection from "./building-type-selection";
+import MultipleBuildingsCreation from "./multiple-buildings-creation";
+import UnitsCreation from "./units-creation";
+import BuildingConfirmation from "./building-confirmation";
 import { createBuilding } from "wasp/client/operations";
 import { useQuery, getBuildingDetail } from "wasp/client/operations";
-import ParkingCreation from "../../../components/buildings/parking-creation";
+import ParkingCreation from "./parking-creation";
 import { VehicleType, RoomStatus } from "@prisma/client";
 
 export type BuildingType = "single" | "multiple";

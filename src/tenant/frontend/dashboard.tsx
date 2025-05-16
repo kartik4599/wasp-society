@@ -9,7 +9,7 @@ import {
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Progress } from "../../components/ui/progress";
-import EmptyState from "../../components/dashboard/empty-state";
+import EmptyState from "../../components/empty-state";
 
 // Mock data - in a real app, this would come from an API
 const MOCK_DATA = {

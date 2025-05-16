@@ -177,7 +177,7 @@ crud ParkingSlots {
 
 route PaymentPageRoute { path: "/payment-detail", to: PaymentPage }
 page PaymentPage {
-  component: import { PaymentPage } from "@src/owner/frontend/payments/payment-page"
+  component: import { PaymentsManagement } from "@src/owner/frontend/payments/payments-management"
 }
 
 query getPaymentSummary {

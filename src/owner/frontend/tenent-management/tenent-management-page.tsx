@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { Card } from "../../../components/ui/card";
-import TenantSearchFilters from "../../../components/tenants/tenant-search-filters";
-import TenantTable from "../../../components/tenants/tenant-table";
+import TenantSearchFilters from "./tenant-search-filters";
+import TenantTable from "./tenant-table";
 import { useQuery, getTenentDetailList } from "wasp/client/operations";
-import TenantPaginationActions from "../../../components/tenants/tenant-pagination-actions";
+import CommonPaginationActions from "../../../components/common-pagination-actions";
 import { GetTenentDetailListArgs } from "../../../owner/backend/tenent-management/querys";
 import { Building } from "wasp/entities";
 import { Button } from "../../../components/ui/button";
 import { UserPlus } from "lucide-react";
 import { Link, routes } from "wasp/client/router";
-import { useNavigate } from "react-router-dom";
 
 export function TenentManagement() {
   const [filters, setFilters] = useState<GetTenentDetailListArgs>({
@@ -18,7 +17,6 @@ export function TenentManagement() {
   });
   const { data } = useQuery(getTenentDetailList, filters);
   const [buildings, setBuildings] = useState<Building[]>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!data?.buildings) return;
@@ -61,7 +59,7 @@ export function TenentManagement() {
       <Card className="backdrop-blur-lg bg-white/30 border border-white/50 shadow-xl rounded-2xl p-6 mb-6">
         <TenantTable tenantList={data?.tenantList || []} />
       </Card>
-      <TenantPaginationActions
+      <CommonPaginationActions
         onFilterChange={handleFilterChange}
         isLast={data?.total === data?.tenantList.length}
         page={filters.page}

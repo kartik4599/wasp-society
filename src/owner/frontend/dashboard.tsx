@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
-import EmptyState from "../../components/dashboard/empty-state";
+import EmptyState from "../../components/empty-state";
 import DashboardBuilding from "./building/dashboard-building";
 import DashboardTenantlist from "./tenent-management/dashboard-tenantlist";
 

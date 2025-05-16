@@ -92,6 +92,8 @@ export const OnboardingPage = () => {
         switch (userData.role) {
           case Role.owner:
             return <SuccessStep userData={userData} />;
+          case Role.staff:
+            return <SuccessStep userData={userData} />;
           default:
             return (
               <AdditionalInformation onNext={handleNext} onBack={handleBack} />

@@ -8,12 +8,12 @@ import {
 } from "../../../components/ui/tabs";
 import { Button } from "../../../components/ui/button";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
-import TenantProfile from "../../../components/tenants/detail/tenant-profile";
-import TenantAgreement from "../../../components/tenants/detail/tenant-agreement";
-import TenantPayments from "../../../components/tenants/detail/tenant-payments";
-import TenantParking from "../../../components/tenants/detail/tenant-parking";
-import TenantDocuments from "../../../components/tenants/detail/tenant-documents";
-import TenantActivity from "../../../components/tenants/detail/tenant-activity";
+import TenantProfile from "./tenant-profile";
+import TenantAgreement from "./tenant-agreement";
+import TenantPayments from "./tenant-payments";
+import TenantParking from "./tenant-parking";
+import TenantDocuments from "./tenant-documents";
+import TenantActivity from "./tenant-activity";
 import {
   Dialog,
   DialogContent,

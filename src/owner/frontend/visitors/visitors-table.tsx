@@ -22,7 +22,7 @@ import {
   UserX,
 } from "lucide-react";
 import { mockVisitors, Visitor } from "./visitors-management";
-import EmptyState from "../../../components/dashboard/empty-state";
+import EmptyState from "../../../components/empty-state";
 import { Card } from "../../../components/ui/card";
 
 interface VisitorsTableProps {

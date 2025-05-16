@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import EmptyState from "../../../components/dashboard/empty-state";
+import EmptyState from "../../../components/empty-state";
 import {
   Card,
   CardContent,

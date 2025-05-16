@@ -5,7 +5,7 @@ import {
 import { z } from "zod";
 import { HttpError } from "wasp/server";
 import { PaymentStatus, PaymentMethod } from "@prisma/client";
-import { formSchema } from "../../../components/payments/add-payment-dialog";
+import { formSchema } from "../../frontend/payments/add-payment-dialog";
 
 export const makePaymentPaid: MakePaymentPaid<{
   paymentIds: number[];

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Card } from "../../../components/ui/card";
-import SelectUnit from "../../../components/tenants/onboarding/select-unit";
-import TenantDetails from "../../../components/tenants/onboarding/tenant-details";
-import AgreementDetails from "../../../components/tenants/onboarding/agreement-details";
-import ReviewAndConfirm from "../../../components/tenants/onboarding/review-confirm";
-import SuccessStep from "../../../components/tenants/onboarding/success-step";
-import MaintenanceAndParking from "../../../components/tenants/onboarding/maintenance-parking";
+import SelectUnit from "./select-unit";
+import TenantDetails from "./tenant-details";
+import AgreementDetails from "./agreement-details";
+import ReviewAndConfirm from "./review-confirm";
+import SuccessStep from "./success-step";
+import MaintenanceAndParking from "./maintenance-parking";
 import { Building2, CircleCheckBig, FileText, User, Car } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { Agreement, ParkingSlot } from "wasp/entities";

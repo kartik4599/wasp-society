@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import { UNIT_TYPES } from "../../../components/buildings/units-creation";
+import { UNIT_TYPES } from "./units-creation";
 import { UnitDeatil } from "../../backend/building/querys";
 
 interface UpdateUnitDialogProps {
