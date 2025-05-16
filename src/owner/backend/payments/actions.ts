@@ -2,10 +2,9 @@ import {
   type MakePaymentPaid,
   type CreatePayment,
 } from "wasp/server/operations";
-import { z } from "zod";
 import { HttpError } from "wasp/server";
 import { PaymentStatus, PaymentMethod } from "@prisma/client";
-import { formSchema } from "../../frontend/payments/add-payment-dialog";
+import { PaymentFormData } from "../../frontend/payments/add-payment-dialog";
 
 export const makePaymentPaid: MakePaymentPaid<{
   paymentIds: number[];
@@ -30,7 +29,7 @@ export const makePaymentPaid: MakePaymentPaid<{
   });
 };
 
-export const createPayment: CreatePayment<z.infer<typeof formSchema>> = async (
+export const createPayment: CreatePayment<PaymentFormData> = async (
   args,
   ctx
 ) => {

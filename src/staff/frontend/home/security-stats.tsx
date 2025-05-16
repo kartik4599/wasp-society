@@ -1,4 +1,4 @@
-import { Card, CardContent } from "../../components/ui/card";
+import { Card, CardContent } from "../../../components/ui/card";
 import { Users, UserCheck, ShoppingBag, AlertTriangle } from "lucide-react";
 
 export function SecurityStats() {

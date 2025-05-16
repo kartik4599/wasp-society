@@ -1,6 +1,6 @@
 import { AlertCircle, X } from "lucide-react";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { Button } from "../../../components/ui/button";
 
 interface SecurityNotificationProps {
   message: string;

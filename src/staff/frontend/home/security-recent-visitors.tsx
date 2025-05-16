@@ -4,9 +4,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
+} from "../../../components/ui/card";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
 import {
   Clock,
   UserCircle,
@@ -17,7 +17,7 @@ import {
   User,
 } from "lucide-react";
 import { RecentVisitor } from "./security";
-import EmptyState from "../../components/empty-state";
+import EmptyState from "../../../components/empty-state";
 
 interface SecurityRecentVisitorsProps {
   visitors: RecentVisitor[];

@@ -212,7 +212,12 @@ page VisitorPage {
 
 route StaffHomeRoute { path: "/staff-home", to: StaffHome }
 page StaffHome {
-  component: import StaffHome from "@src/staff/home/staff-home"
+  component: import StaffHome from "@src/staff/frontend/home/staff-home"
+}
+
+action createVisitor {
+  fn: import { createVisitor } from "@src/staff/backend/actions",
+  entities: [Visitor]
 }
 
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }

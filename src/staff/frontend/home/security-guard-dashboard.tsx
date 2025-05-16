@@ -11,7 +11,7 @@ import { TodaysLogDialog } from "./todays-log-dialog";
 import { SearchVisitorDialog } from "./search-visitor-dialog";
 import { FlagIncidentDialog } from "./flag-incident-dialog";
 import { mockRecentVisitors } from "./mock-recent-visitors";
-import Logo from "../../components/logo";
+import Logo from "../../../components/logo";
 import { useQuery, getMySociety } from "wasp/client/operations";
 
 interface SecurityGuardDashboardProps {

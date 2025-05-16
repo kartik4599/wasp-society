@@ -4,14 +4,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
+} from "../../../components/ui/dialog";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "../../components/ui/tabs";
-import { Badge } from "../../components/ui/badge";
+} from "../../../components/ui/tabs";
+import { Badge } from "../../../components/ui/badge";
 import { ClipboardList, Clock, UserCheck, UserX } from "lucide-react";
 import { mockRecentVisitors } from "./mock-recent-visitors";
 

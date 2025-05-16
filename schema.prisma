@@ -71,7 +71,7 @@ enum PaymentMethod {
   OTHER
 }
 
-enum GuestType {
+enum VisitorType {
   FAMILY
   FRIEND
   DELIVERY
@@ -252,14 +252,15 @@ model Payment {
 }
 
 model Visitor {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   phoneNumber String?
-  guestType   GuestType
+  visitorType VisitorType
   reason      String?
-  checkInAt   DateTime  @default(now())
+  notes       String?
+  checkInAt   DateTime    @default(now())
   checkOutAt  DateTime?
-  isFlagged   Boolean   @default(false)
+  isFlagged   Boolean     @default(false)
   photoUrl    String?
 
   createdAt DateTime @default(now())

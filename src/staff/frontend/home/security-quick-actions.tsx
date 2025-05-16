@@ -1,5 +1,5 @@
 import { UserPlus, UserCheck, ClipboardList, Search, Flag } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "../../../components/ui/button";
 
 interface SecurityQuickActionsProps {
   onActionClick: (action: string) => void;

@@ -77,6 +77,8 @@ interface AddPaymentDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+export type PaymentFormData = z.infer<typeof formSchema>;
+
 export function AddPaymentDialog({
   open,
   onOpenChange,
@@ -86,7 +88,7 @@ export function AddPaymentDialog({
     page: 1,
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<PaymentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: "",
@@ -98,7 +100,7 @@ export function AddPaymentDialog({
 
   const isPaid = form.watch("isPaid");
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: PaymentFormData) => {
     console.log("Form values:", values);
     await createPayment(values);
     onOpenChange(false);
