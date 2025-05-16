@@ -205,8 +205,8 @@ action createPayment {
   entities: [Society, Payment, Unit]
 }
 
-route VisitorRoute { path: "/path", to: Visitor }
-page Visitor {
+route VisitorRoute { path: "/path", to: VisitorPage }
+page VisitorPage {
   component: import { VisitorsManagement } from "@src/owner/frontend/visitors/visitors-management.tsx"
 }
 

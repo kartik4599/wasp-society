@@ -71,6 +71,16 @@ enum PaymentMethod {
   OTHER
 }
 
+enum GuestType {
+  FAMILY
+  FRIEND
+  DELIVERY
+  MAID
+  DRIVER
+  VENDOR
+  OTHER
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String?
@@ -89,6 +99,8 @@ model User {
   MemberInformation     MemberInformation[]
   ParkingSlot           ParkingSlot[]
   Payment               Payment[]
+  Guest                 Visitor[]              @relation(name: "guest")
+  Guard                 Visitor[]              @relation(name: "visitor")
 }
 
 model PersonalInformation {
@@ -128,13 +140,16 @@ model MemberInformation {
 }
 
 model Society {
-  id          Int        @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String
   address     String
   type        String
-  createdById Int        @unique
-  createdBy   User       @relation(fields: [createdById], references: [id])
-  Buildings   Building[]
+  createdById Int    @unique
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  Buildings Building[]
+  Payment   Payment[]
+  Visitor   Visitor[]
 
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
@@ -169,6 +184,7 @@ model Unit {
   Agreement   Agreement[]
   ParkingSlot ParkingSlot[]
   Payment     Payment[]
+  Visitor     Visitor[]
 
   @@unique([name, buildingId])
 }
@@ -230,4 +246,28 @@ model Payment {
   tenant    User    @relation(fields: [tenantId], references: [id])
   unitId    Int
   unit      Unit    @relation(fields: [unitId], references: [id])
+}
+
+model Visitor {
+  id          Int       @id @default(autoincrement())
+  name        String
+  phoneNumber String?
+  guestType   GuestType
+  reason      String?
+  checkInAt   DateTime  @default(now())
+  checkOutAt  DateTime?
+  isFlagged   Boolean   @default(false)
+  photoUrl    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  societyId Int
+  society   Society @relation(fields: [societyId], references: [id])
+  unitId    Int
+  unit      Unit    @relation(fields: [unitId], references: [id])
+  tenantId  Int?
+  tenant    User?   @relation(fields: [tenantId], references: [id], name: "guest")
+  guardId   Int? // User ID of the security guard who added this
+  guard     User?   @relation(fields: [guardId], references: [id], name: "visitor")
 }
