@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import { RecentVisitor } from "./security";
 import EmptyState from "../../../components/empty-state";
+import { getStaffSummary, useQuery } from "wasp/client/operations";
+import { format } from "date-fns";
+import { VisitorType } from "@prisma/client";
 
 interface SecurityRecentVisitorsProps {
   visitors: RecentVisitor[];
@@ -26,21 +29,23 @@ interface SecurityRecentVisitorsProps {
 export function SecurityRecentVisitors({
   visitors,
 }: SecurityRecentVisitorsProps) {
-  const [expandedVisitor, setExpandedVisitor] = useState<string | null>(null);
+  const { data: summary } = useQuery(getStaffSummary);
 
-  const toggleExpand = (visitorId: string) => {
+  const [expandedVisitor, setExpandedVisitor] = useState<number | null>(null);
+
+  const toggleExpand = (visitorId: number) => {
     setExpandedVisitor(expandedVisitor === visitorId ? null : visitorId);
   };
 
-  const getVisitorTypeIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case "family":
+  const getVisitorTypeIcon = (type: VisitorType) => {
+    switch (type) {
+      case VisitorType.FAMILY:
         return <Users className="h-4 w-4" />;
-      case "delivery":
+      case VisitorType.DELIVERY:
         return <ShoppingBag className="h-4 w-4" />;
-      case "vendor":
+      case VisitorType.VENDOR:
         return <Briefcase className="h-4 w-4" />;
-      case "maid":
+      case VisitorType.MAID:
         return <Home className="h-4 w-4" />;
       default:
         return <User className="h-4 w-4" />;
@@ -63,14 +68,14 @@ export function SecurityRecentVisitors({
         Recent Visitor Entries
       </h2>
       <div className="space-y-3">
-        {visitors.map((visitor) => (
+        {summary?.recentVisitors.map((visitor) => (
           <Card key={visitor.id} className="overflow-hidden">
             <CardHeader className="p-3 pb-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  {visitor.photo ? (
+                  {visitor.photoUrl ? (
                     <img
-                      src={visitor.photo || "/placeholder.svg"}
+                      src={visitor.photoUrl || "/placeholder.svg"}
                       alt={visitor.name}
                       className="h-10 w-10 rounded-full object-cover mr-3"
                     />
@@ -85,19 +90,19 @@ export function SecurityRecentVisitors({
                     </CardTitle>
                     <div className="flex items-center text-xs text-gray-500 mt-0.5">
                       <Clock className="h-3 w-3 mr-1" />
-                      {visitor.timestamp}
+                      {format(visitor.checkInAt, "hh:mm aaa")}
                     </div>
                   </div>
                 </div>
                 <Badge
                   variant="outline"
                   className={`${
-                    visitor.status === "in"
-                      ? "bg-green-100 text-green-800 border-green-200"
-                      : "bg-gray-100 text-gray-800"
+                    visitor.checkOutAt
+                      ? "bg-gray-100 text-gray-800"
+                      : "bg-green-100 text-green-800 border-green-200"
                   }`}
                 >
-                  {visitor.status === "in" ? "IN" : "OUT"}
+                  {visitor.checkOutAt ? "OUT" : "IN"}
                 </Badge>
               </div>
             </CardHeader>
@@ -108,10 +113,12 @@ export function SecurityRecentVisitors({
                     variant="outline"
                     className="flex items-center gap-1 mr-2"
                   >
-                    {getVisitorTypeIcon(visitor.type)}
-                    {visitor.type}
+                    {getVisitorTypeIcon(visitor.visitorType)}
+                    {visitor.visitorType}
                   </Badge>
-                  <span className="text-gray-600">Unit: {visitor.unit}</span>
+                  <span className="text-gray-600">
+                    Unit: {visitor.unit.name}
+                  </span>
                 </div>
                 <Button
                   variant="ghost"
@@ -127,11 +134,11 @@ export function SecurityRecentVisitors({
                 <div className="mt-3 pt-3 border-t text-sm space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Purpose:</span>
-                    <span>{visitor.purpose}</span>
+                    <span>{visitor.reason}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Phone:</span>
-                    <span>{visitor.phone}</span>
+                    <span>{visitor.phoneNumber}</span>
                   </div>
                   {visitor.notes && (
                     <div className="flex flex-col">

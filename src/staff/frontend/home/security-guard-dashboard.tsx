@@ -14,18 +14,7 @@ import { mockRecentVisitors } from "./mock-recent-visitors";
 import Logo from "../../../components/logo";
 import { useQuery, getMySociety } from "wasp/client/operations";
 
-interface SecurityGuardDashboardProps {
-  guard: {
-    id: string;
-    name: string;
-    photo: string;
-    gate: string;
-    shift: string;
-    status: string;
-  };
-}
-
-export function SecurityGuardDashboard({ guard }: SecurityGuardDashboardProps) {
+export function SecurityGuardDashboard() {
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
   // const [hasNotification, setHasNotification] = useState(true);
   const [recentVisitors, setRecentVisitors] = useState(mockRecentVisitors);

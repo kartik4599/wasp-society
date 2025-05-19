@@ -60,7 +60,7 @@ interface AddVisitorDialogProps {
 }
 
 export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
-  const units = Units.getAll.useQuery();
+  const { data: units } = Units.getAll.useQuery();
 
   const form = useForm<VisitorFormData>({
     resolver: zodResolver(visitorFormSchema),
@@ -180,7 +180,7 @@ export function AddVisitorDialog({ open, onClose }: AddVisitorDialogProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {units.data
+                          {units
                             ?.filter((unit) => unit.status === "occupied")
                             ?.map((unit) => (
                               <SelectItem

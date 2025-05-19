@@ -1,7 +1,10 @@
 import { Card, CardContent } from "../../../components/ui/card";
 import { Users, UserCheck, ShoppingBag, AlertTriangle } from "lucide-react";
+import { getStaffSummary, useQuery } from "wasp/client/operations";
 
 export function SecurityStats() {
+  const { data: summary } = useQuery(getStaffSummary);
+
   return (
     <section className="space-y-3 w-full">
       <h2 className="text-sm font-medium text-gray-600">Today's Summary</h2>
@@ -13,7 +16,7 @@ export function SecurityStats() {
             </div>
             <div>
               <p className="text-xs text-gray-500">Checked In Today</p>
-              <p className="text-xl font-semibold">12</p>
+              <p className="text-xl font-semibold">{summary?.totalCheckIns}</p>
             </div>
           </CardContent>
         </Card>
@@ -24,7 +27,7 @@ export function SecurityStats() {
             </div>
             <div>
               <p className="text-xs text-gray-500">Currently Inside</p>
-              <p className="text-xl font-semibold">4</p>
+              <p className="text-xl font-semibold">{summary?.totalInside}</p>
             </div>
           </CardContent>
         </Card>
@@ -35,7 +38,9 @@ export function SecurityStats() {
             </div>
             <div>
               <p className="text-xs text-gray-500">Deliveries Logged</p>
-              <p className="text-xl font-semibold">5</p>
+              <p className="text-xl font-semibold">
+                {summary?.totalDeliveries}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -46,7 +51,7 @@ export function SecurityStats() {
             </div>
             <div>
               <p className="text-xs text-gray-500">Flagged/Suspicious</p>
-              <p className="text-xl font-semibold">1</p>
+              <p className="text-xl font-semibold"> {summary?.totalFlagged}</p>
             </div>
           </CardContent>
         </Card>
