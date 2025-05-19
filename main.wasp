@@ -225,6 +225,16 @@ query getStaffSummary {
   entities: [Visitor]
 }
 
+query getCheckInVisitor {
+  fn: import { getCheckInVisitor } from "@src/staff/backend/querys",
+  entities: [Visitor]
+}
+
+action checkOutVisitor {
+  fn: import { checkOutVisitor } from "@src/staff/backend/actions",
+  entities: [Visitor]
+}
+
 route TenantDashboardRoute { path: "/tenant", to: TenantDashboard }
 page TenantDashboard{
   authRequired: true,

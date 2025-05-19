@@ -11,7 +11,8 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group";
 import { UserCheck } from "lucide-react";
-import { mockRecentVisitors } from "./mock-recent-visitors";
+import { useQuery, getCheckInVisitor } from "wasp/client/operations";
+import { format } from "date-fns";
 
 interface CheckoutVisitorDialogProps {
   open: boolean;
@@ -23,20 +24,9 @@ export function CheckoutVisitorDialog({
   onClose,
 }: CheckoutVisitorDialogProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedVisitor, setSelectedVisitor] = useState<string | null>(null);
+  const [selectedVisitor, setSelectedVisitor] = useState<number | null>(null);
 
-  // Filter visitors who are still checked in
-  const activeVisitors = mockRecentVisitors.filter(
-    (visitor) => visitor.status === "in"
-  );
-
-  const filteredVisitors = searchQuery
-    ? activeVisitors.filter(
-        (visitor) =>
-          visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          visitor.unit.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : activeVisitors;
+  const { data } = useQuery(getCheckInVisitor, { query: searchQuery });
 
   const handleCheckout = () => {
     if (!selectedVisitor) return;
@@ -65,29 +55,32 @@ export function CheckoutVisitorDialog({
             />
           </div>
 
-          {filteredVisitors.length > 0 ? (
+          {data && data.length > 0 ? (
             <div className="space-y-2">
               <Label>Select Visitor to Check-Out</Label>
               <RadioGroup
-                value={selectedVisitor || ""}
-                onValueChange={setSelectedVisitor}
+                value={selectedVisitor?.toString() || ""}
+                onValueChange={(value) => setSelectedVisitor(Number(value))}
               >
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                  {filteredVisitors.map((visitor) => (
+                  {data.map((visitor) => (
                     <div
                       key={visitor.id}
                       className="flex items-center space-x-2 border rounded-md p-2 hover:bg-gray-50 cursor-pointer"
                       onClick={() => setSelectedVisitor(visitor.id)}
                     >
-                      <RadioGroupItem value={visitor.id} id={visitor.id} />
+                      <RadioGroupItem
+                        value={visitor.id.toString()}
+                        id={visitor.id.toString()}
+                      />
                       <Label
-                        htmlFor={visitor.id}
+                        htmlFor={visitor.id.toString()}
                         className="flex-1 cursor-pointer"
                       >
                         <div className="font-medium">{visitor.name}</div>
                         <div className="text-sm text-gray-500">
-                          {visitor.type} • Unit {visitor.unit} •{" "}
-                          {visitor.timestamp}
+                          {visitor.visitorType} • Unit {visitor.unit.name} •{" "}
+                          {format(visitor.checkInAt, "hh:mm aaa")}
                         </div>
                       </Label>
                     </div>
